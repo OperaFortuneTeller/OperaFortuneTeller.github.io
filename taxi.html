@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<!-- saved from url=(0057)https://flowingdata.com/projects/2015/timeuse-simulation/ -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Time Use Simulation</title>
+<link rel="stylesheet" href="./taxi_files/style.css" type="text/css" media="screen">
+<link rel="stylesheet" type="text/css" href="./taxi_files/fonts.css">
+<link href="./taxi_files/css" rel="stylesheet" type="text/css">
+<meta charset="utf-8"><style>.node{stroke-width:1.5px;}</style><style type="text/css" adt="123"></style><script>if(true){
+(function() {
+    Function.prototype.bind = function() {
+        var fn = this, args = Array.prototype.slice.call(arguments), obj = args.shift();
+        return function() {
+            return fn.apply(obj, args.concat(Array.prototype.slice.call(arguments)));
+        };
+    };
+    function A() {}
+    A.prototype = {
+        rules: {
+        },
+        _done: null,
+        get done() {
+            if(!this._done) {
+                this._done = new Array();
+            }
+            return this._done;
+        },
+        addAnimations: function() {
+            var style = document.createElement('style');
+            style.type = 'text/css';
+            style.innerHTML = 'object,embed{\
+                -webkit-animation-duration:.001s;-webkit-animation-name:playerInserted;\
+                -ms-animation-duration:.001s;-ms-animation-name:playerInserted;\
+                -o-animation-duration:.001s;-o-animation-name:playerInserted;\
+                animation-duration:.001s;animation-name:playerInserted;}\
+                @-webkit-keyframes playerInserted{from{opacity:0.99;}to{opacity:1;}}\
+                @-ms-keyframes playerInserted{from{opacity:0.99;}to{opacity:1;}}\
+                @-o-keyframes playerInserted{from{opacity:0.99;}to{opacity:1;}}\
+                @keyframes playerInserted{from{opacity:0.99;}to{opacity:1;}}';
+            document.getElementsByTagName('head')[0].appendChild(style);
+        },
+        animationsHandler: function(e) {
+            if(e.animationName === 'playerInserted') {
+                this.replace(e.target);
+            }
+        },
+        replace: function(elem) {
+            if(this.done.indexOf(elem) != -1) return;
+            this.done.push(elem);
+            var player = elem.data || elem.src;
+            if(!player) return;
+            var i, find, replace = false;
+            for(i in this.rules) {
+                find = this.rules[i]['find'];
+                if(find.test(player)) {
+                    replace = this.rules[i]['replace'];
+                    if('function' === typeof this.rules[i]['preHandle']) {
+                        this.rules[i]['preHandle'].bind(this, elem, find, replace, player)();
+                    }else{
+                        this.reallyReplace.bind(this, elem, find, replace)();
+                    }
+                    break;
+                }
+            }
+        },
+        reallyReplace: function(elem, find, replace) {
+            elem.data && (elem.data = elem.data.replace(find, replace)) || elem.src && ((elem.src = elem.src.replace(find, replace)) && (elem.style.display = 'block'));
+            var b = elem.querySelector("param[name='movie']");
+            this.reloadPlugin(elem);
+        },
+        reloadPlugin: function(elem) {
+            var nextSibling = elem.nextSibling;
+            var parentNode = elem.parentNode;
+            parentNode.removeChild(elem);
+            var newElem = elem.cloneNode(true);
+            this.done.push(newElem);
+            if(nextSibling) {
+                parentNode.insertBefore(newElem, nextSibling);
+            } else {
+                parentNode.appendChild(newElem);
+            }
+        },
+        init: function() {
+            var desc = navigator.mimeTypes['application/x-shockwave-flash'].description.toLowerCase();
+            var handler = this.animationsHandler.bind(this);
+            document.body.addEventListener('webkitAnimationStart', handler, false);
+            document.body.addEventListener('msAnimationStart', handler, false);
+            document.body.addEventListener('oAnimationStart', handler, false);
+            document.body.addEventListener('animationstart', handler, false);
+            this.addAnimations();
+        }
+    };
+    new A().init();
+})();
+}
+</script><style type="text/css">object,embed{                -webkit-animation-duration:.001s;-webkit-animation-name:playerInserted;                -ms-animation-duration:.001s;-ms-animation-name:playerInserted;                -o-animation-duration:.001s;-o-animation-name:playerInserted;                animation-duration:.001s;animation-name:playerInserted;}                @-webkit-keyframes playerInserted{from{opacity:0.99;}to{opacity:1;}}                @-ms-keyframes playerInserted{from{opacity:0.99;}to{opacity:1;}}                @-o-keyframes playerInserted{from{opacity:0.99;}to{opacity:1;}}                @keyframes playerInserted{from{opacity:0.99;}to{opacity:1;}}</style>
+<body data-pinterest-extension-installed="cr1.39.1">
+<div id="main-wrapper">
+<div id="sidebar">
+<div id="current_time">9:00am</div>
+<div id="speed">
+<div class="togglebutton slow current" data-val="slow">Slow</div>
+<div class="togglebutton medium" data-val="medium">Medium</div>
+<div class="togglebutton fast" data-val="fast">Fast</div>
+<div class="clr"></div>
+</div>
+<div id="note" style="top: 20px; color: rgb(0, 0, 0);">The simulation kicks in, based on data from New York Taxi.</div>
+<div id="cite">
+This is a simulation of hot spots taxi demand forecasting in New York</a>.
+</div>
+</div>
+<div style="background-image: url(../images/NY2.png); background-size: cover;" id="chart"></div>
+
+<div class="clr"></div>
+</div>
+
+<script src="./taxi_files/d3-3-5-5.min.js"></script>
+<script>
+
+var USER_SPEED = "slow";
+var num_of_rows = 21;
+var width = 900,
+    height = 800,
+	padding = 1,
+	maxRadius = 3;
+	// color = d3.scale.category10();
+	
+var sched_objs = [],
+	curr_minute = 0;
+
+var num_of_spots = 8 ;
+
+var index_of_none_spot = num_of_spots-1;
+
+var act_codes_raw = [
+	{"index": "0", "short": "None", "desc": "All other source","x": "450", "y": "900"},
+	{"index": "1", "short": "None", "desc": "All other target", "x": "450", "y": "-200"},
+	{"index": "2", "short": "JFK", "desc": "JFK Airport", "x": "820", "y": "650"},
+	{"index": "3", "short": "LGA", "desc": "LGA Airport", "x": "600", "y": "240"},
+	{"index": "4", "short": "MMA", "desc": "Metropolitan Museum of Art", "x": "373", "y": "230"},
+	{"index": "5", "short": "TSQ", "desc": "Time Square", "x": "310", "y": "300"},
+	{"index": "6", "short": "WST", "desc": "Wall Street", "x": "255", "y": "475"},
+	{"index": "7", "short": "GCT", "desc": "Grand Central Terminal","x": "340", "y": "340"},
+	{"index": "8", "short": "Volunteering", "desc": "Volunteer Activities"},
+	{"index": "9", "short": "Volunteering", "desc": "Volunteer Activities"},
+	{"index": "10", "short": "Volunteering", "desc": "Volunteer Activities"},
+	{"index": "11", "short": "Volunteering", "desc": "Volunteer Activities"},
+	{"index": "12", "short": "Volunteering", "desc": "Volunteer Activities"},
+	{"index": "13", "short": "Volunteering", "desc": "Volunteer Activities"},
+	{"index": "14", "short": "Phone Calls", "desc": "Telephone Calls"},
+	{"index": "15", "short": "Misc.", "desc": "Other"},
+	{"index": "16", "short": "Traveling", "desc": "Traveling"},
+];
+var act_codes = act_codes_raw.slice(0,num_of_spots);
+
+
+var speeds = { "slow": 1000, "medium": 200, "fast": 50 };
+
+
+var time_notes = [
+	{ "start_minute": 1, "stop_minute": 40, "note": "The simulation kicks in, based on data from the New York Taxi." },
+	{ "start_minute": 70, "stop_minute": 120, "note": "note2" },
+	{ "start_minute": 180, "stop_minute": 300, "note": "note3" },
+	{ "start_minute": 360, "stop_minute": 440, "note": "note4" },
+	{ "start_minute": 480, "stop_minute": 540, "note": "note5" },
+	{ "start_minute": 660, "stop_minute": 720, "note": "note6" },
+	{ "start_minute": 780, "stop_minute": 830, "note": "note7" },
+	{ "start_minute": 870, "stop_minute": 890, "note": "note8" },
+	{ "start_minute": 930, "stop_minute": 1010, "note": "note9" },
+	{ "start_minute": 1080, "stop_minute": 1140, "note": "note10" },
+	{ "start_minute": 1210, "stop_minute": 1300, "note": "note11" },
+];
+var notes_index = 0;
+
+
+// Activity to put in center of circle arrangement
+var center_act = "Housework",
+	center_pt = { "x": 380, "y": 365 };
+
+
+// Coordinates for activities
+var foci = {};
+act_codes.forEach(function(code, i) {
+	foci[code.index] = {x: code.x, y: code.y };
+});
+
+
+// Start the SVG
+var svg = d3.select("#chart").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+
+// Load data and let's do it.
+d3.tsv("data/b.csv", function(error, data) {	
+//d3.tsv("data/taxi_6spot_ui_20141101_20141107.csv", function(error, data) {	
+	
+	data.forEach(function(d) {
+		var day_array = d.day.split(",");
+		var activities = [];
+		for (var i=0; i < day_array.length; i++) {
+			// Duration
+			if (i % 2 == 1 && day_array[i-1] < num_of_spots) {
+				activities.push({'act': day_array[i-1], 'duration': +day_array[i]});
+			}
+		}
+        if (activities.length > 0) {
+            sched_objs.push(activities);
+        }
+		
+	});
+	
+	// Used for percentages by minute
+	var act_counts = { "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "7": 0, "8": 0, "9": 0, "10": 0, "11": 0, "12": 0, "13": 0, "14": 0, "15": 0, "16": 0 };
+	
+	// A node for each person's schedule
+	var nodes = sched_objs.map(function(o,i) {
+		var act = o[0].act;
+		act_counts[act] += 1;
+		var init_x = foci[act].x + Math.random();
+		var init_y = foci[act].y + Math.random();
+		return {
+			act: act,
+			radius: 3,
+			x: init_x,
+			y: init_y,
+			color: color(act),
+			moves: 0,
+			next_move_time: o[0].duration,
+			sched: o,
+		}
+	});
+
+	var force = d3.layout.force()
+		.nodes(nodes)
+		.size([width, height])
+		// .links([])
+		.gravity(0)
+		.charge(0)
+		.friction(.9)
+		.on("tick", tick)
+		.start();
+
+	var circle = svg.selectAll("circle")
+		.data(nodes)
+	    .enter()
+	    .append("circle")
+		.attr("r", function(d) { return d.radius; })
+		.style("fill", function(d) { return d.color; });
+		// .call(force.drag);
+	
+
+
+	// Activity labels
+	var aLink = svg.selectAll("a")
+		.data(act_codes)
+	    .enter().append("a")
+	    .attr("xlink:href", function(d, i) {
+			return d.short+".html"			
+		})
+		.attr("target", "_blank")
+
+	var label = aLink
+		.append("text")
+		.attr("class", "actlabel")
+		.attr("x", function(d, i) {
+			return d.x-50			
+		})
+		.attr("y", function(d, i) {
+			return d.y
+			
+		});
+
+	label.append("tspan")
+		.attr("x", function() { return d3.select(this.parentNode).attr("x"); })
+		// .attr("dy", "1.3em")
+		.attr("text-anchor", "middle")
+		.attr("fill","red")
+		.text(function(d) {
+			return d.short == "None" ? "" : d.short;
+		});
+	label.append("tspan")
+		.attr("dy", "1.3em")
+		.attr("x", function() { return d3.select(this.parentNode).attr("x"); })
+		.attr("text-anchor", "middle")
+		.attr("fill","red")
+		.attr("class", "actpct")
+		.text(function(d) {
+			return d.index<2 ? "" :act_counts[d.index];
+		});
+		
+
+	// Update nodes based on activity and duration
+	function timer() {
+		d3.range(nodes.length).map(function(i) {
+			var curr_node = nodes[i],
+				curr_moves = curr_node.moves; 
+
+			// Time to go to next activity
+			if (curr_node.next_move_time == curr_minute) {
+				if (curr_node.moves == curr_node.sched.length-1) {
+					curr_moves = 0;
+				} else {
+					curr_moves += 1;
+				}
+			
+				// Subtract from current activity count
+				act_counts[curr_node.act] -= 1;
+			
+				// Move on to next activity
+				curr_node.act = curr_node.sched[ curr_moves ].act;
+			
+				// Add to new activity count
+				act_counts[curr_node.act] += 1;
+			
+				curr_node.moves = curr_moves;
+				curr_node.cx = foci[curr_node.act].x;
+				curr_node.cy = foci[curr_node.act].y;
+			
+				nodes[i].next_move_time += nodes[i].sched[ curr_node.moves ].duration;
+			}
+
+		});
+
+		force.resume();
+		curr_minute += 1;
+
+		// Update percentages
+		label.selectAll("tspan.actpct")
+			.text(function(d) {
+				//return readablePercent(act_counts[d.index]);
+				return d.index<2 ? "" :act_counts[d.index];
+			});
+	
+		// Update time
+		var true_minute = curr_minute % 1440;
+		d3.select("#current_time").text(minutesToTime(true_minute));
+		
+		// Update notes
+		// var true_minute = curr_minute % 1440;
+		if (true_minute == time_notes[notes_index].start_minute) {
+			d3.select("#note")
+				.style("top", "0px")
+			  .transition()
+				.duration(600)
+				.style("top", "20px")
+				.style("color", "#000000")
+				.text(time_notes[notes_index].note);
+		} 
+		
+		// Make note disappear at the end.
+		else if (true_minute == time_notes[notes_index].stop_minute) {
+			
+			d3.select("#note").transition()
+				.duration(1000)
+				.style("top", "300px")
+				.style("color", "#ffffff");
+				
+			notes_index += 1;
+			if (notes_index == time_notes.length) {
+				notes_index = 0;
+			}
+		}
+		
+		
+		setTimeout(timer, speeds[USER_SPEED]);
+	}
+	setTimeout(timer, speeds[USER_SPEED]);
+	
+	
+	
+		
+	function tick(e) {
+	  var k = 0.04 * e.alpha;
+  
+	  // Push nodes toward their designated focus.
+	  nodes.forEach(function(o, i) {
+		var curr_act = o.act;
+		
+		// Make sleep more sluggish moving.
+		if (curr_act == "0") {
+			var damper = 0.6;
+		} else {
+			var damper = 1;
+		}
+		o.color = color(curr_act);
+	    o.y += (foci[curr_act].y - o.y) * k * damper;
+	    o.x += (foci[curr_act].x - o.x) * k * damper;
+	  });
+
+
+	  circle
+	  	  .each(collide(.5))
+	  	  .style("fill", function(d) { return d.color; })
+	      .attr("cx", function(d) { return d.x; })
+	      .attr("cy", function(d) { return d.y; });
+	}
+
+
+	// Resolve collisions between nodes.
+	function collide(alpha) {
+	  var quadtree = d3.geom.quadtree(nodes);
+	  return function(d) {
+	    var r = d.radius + maxRadius + padding,
+	        nx1 = d.x - r,
+	        nx2 = d.x + r,
+	        ny1 = d.y - r,
+	        ny2 = d.y + r;
+	    quadtree.visit(function(quad, x1, y1, x2, y2) {
+	      if (quad.point && (quad.point !== d)) {
+	        var x = d.x - quad.point.x,
+	            y = d.y - quad.point.y,
+	            l = Math.sqrt(x * x + y * y),
+	            r = d.radius + quad.point.radius + (d.act !== quad.point.act) * padding;
+	        if (l < r) {
+	          l = (l - r) / l * alpha;
+	          d.x -= x *= l;
+	          d.y -= y *= l;
+	          quad.point.x += x;
+	          quad.point.y += y;
+	        }
+	      }
+	      return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
+	    });
+	  };
+	}
+	
+	
+	
+	
+	// Speed toggle
+	d3.selectAll(".togglebutton")
+      .on("click", function() {
+        if (d3.select(this).attr("data-val") == "slow") {
+            d3.select(".slow").classed("current", true);
+			d3.select(".medium").classed("current", false);
+            d3.select(".fast").classed("current", false);
+        } else if (d3.select(this).attr("data-val") == "medium") {
+            d3.select(".slow").classed("current", false);
+			d3.select(".medium").classed("current", true);
+            d3.select(".fast").classed("current", false);
+        } 
+		else {
+            d3.select(".slow").classed("current", false);
+			d3.select(".medium").classed("current", false);
+			d3.select(".fast").classed("current", true);
+        }
+		
+		USER_SPEED = d3.select(this).attr("data-val");
+    });
+}); // @end d3.tsv
+
+
+
+function color(activity) {
+	
+	var colorByActivity = {
+		"0": "none",
+		"1": "#bbbbbb",
+		"2": "#DB32A4",
+		"3": "#a477c8",
+		"4": "#1c8af9",
+		"5": "#FF7F00",
+		"6": "#00CDF8",
+		"7": "#038a6c",
+		"8": "none",
+		"9": "none",
+		"10": "none",
+		"11": "none",
+		"12": "none",
+		"13": "#038a6c",
+		"14": "none",
+		"15": "#ee8e76",
+		"16": "none",
+	}
+	
+	return colorByActivity[activity];
+	
+}
+
+
+
+// Output readable percent based on count.
+function readablePercent(n) {
+	
+	var pct = 100 * n / num_of_rows;
+	if (pct < 1 && pct > 0) {
+		pct = "<1%";
+	} else {
+		pct = Math.round(pct) + "%";
+	}
+	
+	return pct;
+}
+
+
+// Minutes to time of day. Data is minutes from 9am.
+function minutesToTime(m) {
+	var minutes = (m + 9*60) % 1440;
+	var hh = Math.floor(minutes / 60);
+	var ampm;
+	if (hh > 12) {
+		hh = hh - 12;
+		ampm = "pm";
+	} else if (hh == 12) {
+		ampm = "pm";
+	} else if (hh == 0) {
+		hh = 12;
+		ampm = "am";
+	} else {
+		ampm = "am";
+	}
+	var mm = minutes % 60;
+	if (mm < 10) {
+		mm = "0" + mm;
+	}
+	
+	return hh + ":" + mm + ampm
+}
+
+
+</script></body></html>
