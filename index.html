@@ -132,12 +132,12 @@ var num_of_spots = 8 ;
 var index_of_none_spot = num_of_spots-1;
 
 var act_codes_raw = [
-	{"index": "0", "short": "None", "desc": "All other source","x": "250", "y": "900"},
-	{"index": "1", "short": "None", "desc": "All other target", "x": "600", "y": "-200"},
-	{"index": "2", "short": "JFK", "desc": "JFK Airport", "x": "820", "y": "650"},
-	{"index": "3", "short": "LGA", "desc": "LGA Airport", "x": "600", "y": "240"},
+	{"index": "0", "short": "None", "desc": "None","x": "250", "y": "900"},
+	{"index": "1", "short": "None", "desc": "None", "x": "600", "y": "-200"},
+	{"index": "2", "short": "JFK", "desc": "John F. Kennedy International Airport", "x": "820", "y": "650"},
+	{"index": "3", "short": "LGA", "desc": "LaGuardia Airport", "x": "600", "y": "240"},
 	{"index": "4", "short": "MMA", "desc": "Metropolitan Museum of Art", "x": "373", "y": "230"},
-	{"index": "5", "short": "TSQ", "desc": "Time Square", "x": "310", "y": "300"},
+	{"index": "5", "short": "TSQ", "desc": "Times Square", "x": "310", "y": "300"},
 	{"index": "6", "short": "WST", "desc": "Wall Street", "x": "255", "y": "475"},
 	{"index": "7", "short": "GCT", "desc": "Grand Central Terminal","x": "340", "y": "340"},
 	{"index": "8", "short": "Volunteering", "desc": "Volunteer Activities"},
@@ -258,6 +258,10 @@ d3.tsv("data/c.csv", function(error, data) {
 	    //(d.index==2 || d.index==5) ? "xlink:href":"dummy"
 		.attr("target", "_blank")
 
+    var title = aLink
+		.append("title")
+		.text(function(d) { return d.desc == "None" ? "" : d.desc; })
+
 	var rect = aLink
 		.append("rect")
 		.attr("height",50)
@@ -275,7 +279,6 @@ d3.tsv("data/c.csv", function(error, data) {
 
 	label.append("tspan")
 		.attr("x", function() { return d3.select(this.parentNode).attr("x"); })
-		// .attr("dy", "1.3em")
 		.attr("text-anchor", "middle")
 		.text(function(d) { return d.short == "None" ? "" : d.short; });
 	label.append("tspan")
@@ -363,8 +366,6 @@ d3.tsv("data/c.csv", function(error, data) {
 	setTimeout(timer, speeds[USER_SPEED]);
 	
 	
-	
-		
 	function tick(e) {
 	  var k = 0.04 * e.alpha;
   
