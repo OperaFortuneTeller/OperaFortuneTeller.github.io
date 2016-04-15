@@ -253,41 +253,31 @@ d3.tsv("data/b.csv", function(error, data) {
 	// Activity labels
 	var aLink = svg.selectAll("a")
 		.data(act_codes)
-	    .enter().append("a")
-	    .attr("xlink:href", function(d, i) {
-			return d.short+".html"			
-		})
+	    .enter()
+	    .append("a")
+	    .attr("xlink:href", function(d, i) { return d.short+".html"	})
 		.attr("target", "_blank")
 
 	var label = aLink
 		.append("text")
 		.attr("class", "actlabel")
-		.attr("x", function(d, i) {
-			return d.x-50			
-		})
-		.attr("y", function(d, i) {
-			return d.y
-			
-		});
+		.attr("x", function(d, i) { return d.x-50 })
+		.attr("y", function(d, i) { return d.y });
 
 	label.append("tspan")
 		.attr("x", function() { return d3.select(this.parentNode).attr("x"); })
 		// .attr("dy", "1.3em")
 		.attr("text-anchor", "middle")
-		.attr("fill","red")
-		.text(function(d) {
-			return d.short == "None" ? "" : d.short;
-		});
+		.attr("fill",function(d) { return color(d.index); })
+		.text(function(d) { return d.short == "None" ? "" : d.short; });
 	label.append("tspan")
 		.attr("dy", "1.3em")
 		.attr("x", function() { return d3.select(this.parentNode).attr("x"); })
 		.attr("text-anchor", "middle")
-		.attr("fill","red")
+		.attr("fill",function(d) { return color(d.index); })
 		.attr("class", "actpct")
-		.text(function(d) {
-			return d.index<2 ? "" :act_counts[d.index];
-		});
-		
+		.text(function(d) { return d.index<2 ? "" :act_counts[d.index]; });
+	
 
 	// Update nodes based on activity and duration
 	function timer() {
