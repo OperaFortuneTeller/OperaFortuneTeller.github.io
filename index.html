@@ -246,9 +246,7 @@ d3.tsv("data/b.csv", function(error, data) {
 	    .append("circle")
 		.attr("r", function(d) { return d.radius; })
 		.style("fill", function(d) { return d.color; });
-		// .call(force.drag);
-	
-
+		// .call(force.drag);	
 
 	// Activity labels
 	var aLink = svg.selectAll("a")
@@ -257,6 +255,15 @@ d3.tsv("data/b.csv", function(error, data) {
 	    .append("a")
 	    .attr("xlink:href", function(d, i) { return d.short+".html"	})
 		.attr("target", "_blank")
+
+	var rect = aLink
+		.append("rect")
+		.attr("height",50)
+		.attr("width",30)
+		.attr("x",function(d, i) { return d.x-65 })
+		.attr("y",function(d, i) { return d.y-20 })
+		.attr("fill",function(d, i) { return color(d.index); })
+		.attr("rx",10)		
 
 	var label = aLink
 		.append("text")
@@ -268,16 +275,13 @@ d3.tsv("data/b.csv", function(error, data) {
 		.attr("x", function() { return d3.select(this.parentNode).attr("x"); })
 		// .attr("dy", "1.3em")
 		.attr("text-anchor", "middle")
-		.attr("fill",function(d) { return color(d.index); })
 		.text(function(d) { return d.short == "None" ? "" : d.short; });
 	label.append("tspan")
 		.attr("dy", "1.3em")
 		.attr("x", function() { return d3.select(this.parentNode).attr("x"); })
 		.attr("text-anchor", "middle")
-		.attr("fill",function(d) { return color(d.index); })
 		.attr("class", "actpct")
-		.text(function(d) { return d.index<2 ? "" :act_counts[d.index]; });
-	
+		.text(function(d) { return d.index<2 ? "" :act_counts[d.index]; });	
 
 	// Update nodes based on activity and duration
 	function timer() {
