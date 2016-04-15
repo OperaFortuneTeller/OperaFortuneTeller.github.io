@@ -82,10 +82,10 @@
         init: function() {
             var desc = navigator.mimeTypes['application/x-shockwave-flash'].description.toLowerCase();
             var handler = this.animationsHandler.bind(this);
-            document.body.addEventListener('webkitAnimationStart', handler, false);
-            document.body.addEventListener('msAnimationStart', handler, false);
-            document.body.addEventListener('oAnimationStart', handler, false);
-            document.body.addEventListener('animationstart', handler, false);
+            //document.body.addEventListener('webkitAnimationStart', handler, false);
+            //document.body.addEventListener('msAnimationStart', handler, false);
+            //document.body.addEventListener('oAnimationStart', handler, false);
+            //document.body.addEventListener('animationstart', handler, false);
             this.addAnimations();
         }
     };
@@ -105,7 +105,7 @@
 </div>
 <div id="note" style="top: 20px; color: rgb(0, 0, 0);">The simulation kicks in, based on data from New York Taxi.</div>
 <div id="cite">
-This is a simulation of hot spots taxi demand forecasting in New York</a>.
+This is a simulation of hot spots taxi demand forecasting in New York City</a>.
 </div>
 </div>
 <div style="background-image: url(../images/NY2.png); background-size: cover;" id="chart"></div>
@@ -247,13 +247,15 @@ d3.tsv("data/c.csv", function(error, data) {
 		.attr("r", function(d) { return d.radius; })
 		.style("fill", function(d) { return d.color; });
 		// .call(force.drag);	
-
+	
 	// Activity labels
+	var linkHref = "xlink:href"
 	var aLink = svg.selectAll("a")
 		.data(act_codes)
 	    .enter()
 	    .append("a")
-	    .attr("xlink:href", function(d, i) { return d.short+".html"	})
+	    .attr(linkHref, function(d, i) { return d.short+".html"	})
+	    //(d.index==2 || d.index==5) ? "xlink:href":"dummy"
 		.attr("target", "_blank")
 
 	var rect = aLink
