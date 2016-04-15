@@ -132,8 +132,8 @@ var num_of_spots = 8 ;
 var index_of_none_spot = num_of_spots-1;
 
 var act_codes_raw = [
-	{"index": "0", "short": "None", "desc": "All other source","x": "450", "y": "900"},
-	{"index": "1", "short": "None", "desc": "All other target", "x": "450", "y": "-200"},
+	{"index": "0", "short": "None", "desc": "All other source","x": "250", "y": "900"},
+	{"index": "1", "short": "None", "desc": "All other target", "x": "600", "y": "-200"},
 	{"index": "2", "short": "JFK", "desc": "JFK Airport", "x": "820", "y": "650"},
 	{"index": "3", "short": "LGA", "desc": "LGA Airport", "x": "600", "y": "240"},
 	{"index": "4", "short": "MMA", "desc": "Metropolitan Museum of Art", "x": "373", "y": "230"},
@@ -191,7 +191,7 @@ var svg = d3.select("#chart").append("svg")
 
 
 // Load data and let's do it.
-d3.tsv("data/b.csv", function(error, data) {	
+d3.tsv("data/c.csv", function(error, data) {	
 //d3.tsv("data/taxi_6spot_ui_20141101_20141107.csv", function(error, data) {	
 	
 	data.forEach(function(d) {
@@ -449,7 +449,7 @@ function color(activity) {
 	
 	var colorByActivity = {
 		"0": "none",
-		"1": "#bbbbbb",
+		"1": "#aaaaaa",
 		"2": "#DB32A4",
 		"3": "#a477c8",
 		"4": "#1c8af9",
