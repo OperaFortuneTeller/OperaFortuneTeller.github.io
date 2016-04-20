@@ -104,9 +104,26 @@
 <div class="clr"></div>
 </div>
 <div id="note" style="top: 20px; color: rgb(0, 0, 0);"></div>
+
 <div id="cite">
-This is a simulation of hot spots taxi demand forecasting in New York City</a>.
+This is a simulation of hot spots taxi demand forecasting in New York City.
+<div id="compare">
+	<div id="compareButton" style="text-align:center">
+	<input type="button" onclick="window.open('JFKvsTSQ.html');" value="Compare" />
+	</div>
+	<div id="compareForm ">
+	<form action="">
+	<br>
+	<input type="checkbox" name="JFK" value="JFK" checked>JFK Airport(JFK)<br>
+	<input type="checkbox" name="LGA" value="LGA">LaGuardia Airport(LGA)<br> 
+	<input type="checkbox" name="MMA" value="MMA">Metropolitan Museum of Art(MMA)<br> 
+	<input type="checkbox" name="TSQ" value="TSQ" checked>Times Square(TSQ)<br> 
+	<input type="checkbox" name="WST" value="WST">Wall Street(WST)<br> 
+	</form>
+	</div>
 </div>
+</div>
+
 </div>
 <div style="background-image: url(../images/NY2.png); background-size: cover;" id="chart"></div>
 
@@ -351,7 +368,7 @@ d3.tsv("data/c.csv", function(error, data) {
 			
 			d3.select("#note").transition()
 				.duration(1000)
-				.style("top", "300px")
+				.style("top", "200px")
 				.style("color", "#ffffff");
 				
 			notes_index += 1;
