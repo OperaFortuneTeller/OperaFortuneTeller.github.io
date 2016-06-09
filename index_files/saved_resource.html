@@ -40,6 +40,7 @@
           ['WST', 40.7060006,-74.0109897, 11],
           ['MMA', 40.7794366,-73.9632654, 11]
         ];
+        var markers = []
 
         var directionsDisplay = new google.maps.DirectionsRenderer;
         var directionsService = new google.maps.DirectionsService;
@@ -64,11 +65,9 @@
         directionsDisplay.setMap(map);
         setMarkers(map);
 
-
-        //calculateAndDisplayRoute(directionsService, directionsDisplay);
-
-        // var trafficLayer = new google.maps.TrafficLayer();
-        // trafficLayer.setMap(map);
+        var trafficLayer = new google.maps.TrafficLayer();
+        trafficLayer.setMap(map);
+        
         }
 
         function toggleBounce() {
@@ -104,9 +103,10 @@
             coords: [1, 1, 1, 20, 18, 20, 18, 1],
             type: 'poly'
           };
-          for (var i = 0; i < beaches.length; i++) {
+          var i;
+          for (i = 0; i < beaches.length; i++) {
             var beach = beaches[i];
-            var marker = new google.maps.Marker({
+            markers[i] = new google.maps.Marker({
               position: {lat: beach[1], lng: beach[2]},
               map: map,
               icon: image,
@@ -114,26 +114,33 @@
               title: beach[0],
               zIndex: beach[3]
             });
-            marker.addListener('click', function() {
-                directionsService.route({
-                origin: {lat: init_lat, lng: init_lng},  // Haight.
-                destination: {lat: beach[1], lng: beach[2]},  // Ocean Beach.
-                // Note that Javascript allows us to access the constant
-                // using square brackets and a string value as its
-                // "property."
-                travelMode: google.maps.TravelMode["DRIVING"]
-                }, function(response, status) {
-                if (status == google.maps.DirectionsStatus.OK) {
-                  directionsDisplay.setDirections(response);
-                } else {
-                  window.alert('Directions request failed due to ' + status);
-                }
-                });
-            });
+            markers[i].addListener('click', makeItHappenDelegate(beach));
+
           }
         }
-       
 
+        function makeItHappenDelegate(b) {
+          return function(){
+              xx(b)
+          }
+        }        
+        function xx(bb) {
+          //window.alert(bb);
+          directionsService.route({
+            origin: {lat: init_lat, lng: init_lng},  // Haight.
+            destination: {lat: bb[1], lng: bb[2]},  // Ocean Beach.
+            // Note that Javascript allows us to access the constant
+            // using square brackets and a string value as its
+            // "property."
+            travelMode: google.maps.TravelMode["DRIVING"]
+            }, function(response, status) {
+            if (status == google.maps.DirectionsStatus.OK) {
+              directionsDisplay.setDirections(response);
+            } else {
+              window.alert('Directions request failed due to ' + status);
+            }
+          });
+        }
        
       google.maps.event.addDomListener(window, 'load', initialize);
     </script>
