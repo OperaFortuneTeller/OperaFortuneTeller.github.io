@@ -27,37 +27,110 @@
     </style>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCaVe1zajiHsMDR4LtwP53c7AXfBPP_sn8"></script>
     <script>
-      // In the following example, markers appear when the user clicks on the map.
-      // Each marker is labeled with a single alphabetical character.
-      var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-      var labelIndex = 0;
-      function initialize() {
-        var nyc = { lat: 40.7313752, lng: -73.9249603 };
+        var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        var labelIndex = 0;
+        var init_lat = 40.7313752;
+        var init_lng = -73.9249603;
+
+        // order in which these markers should display on top of each other.
+        var beaches = [
+          ['JFK', 40.6413111,-73.7781391,11],
+          ['TSQ', 40.7588954,-73.9851093, 11],
+          ['LGA', 40.7769018,-73.8739586, 11],
+          ['WST', 40.7060006,-74.0109897, 11],
+          ['MMA', 40.7794366,-73.9632654, 11]
+        ];
+
+        function initialize() {
+        var nyc = { lat: init_lat, lng: init_lng };
+        var directionsDisplay = new google.maps.DirectionsRenderer;
+        var directionsService = new google.maps.DirectionsService;
+
         var map = new google.maps.Map(document.getElementById('map'), {
           zoom: 11,
           center: nyc
         });
 
-        // This event listener calls addMarker() when the map is clicked.
-        google.maps.event.addListener(map, 'click', function(event) {
-          addMarker(event.latLng, map);
+        marker = new google.maps.Marker({
+            map: map,
+            draggable: true,
+            animation: google.maps.Animation.DROP,
+            position: {lat: init_lat, lng: init_lng}
         });
+        marker.addListener('click', toggleBounce);
 
-        // Add a marker at the center of the map.
-        addMarker(nyc, map);
-      }
+        setMarkers(map);
 
-      // Adds a marker to the map.
-      function addMarker(location, map) {
-        // Add the marker at the clicked location, and add the next-available label
-        // from the array of alphabetical characters.
-        var marker = new google.maps.Marker({
-          position: location,
-          label: labels[labelIndex++ % labels.length],
-          map: map
-        });
-      }
+        directionsDisplay.setMap(map);
 
+        //calculateAndDisplayRoute(directionsService, directionsDisplay);
+
+        // var trafficLayer = new google.maps.TrafficLayer();
+        // trafficLayer.setMap(map);
+        }
+
+        function toggleBounce() {
+          if (marker.getAnimation() !== null) {
+            marker.setAnimation(null);
+          } else {
+            marker.setAnimation(google.maps.Animation.BOUNCE);
+          }
+        }
+
+
+        function setMarkers(map) {
+          // Adds markers to the map.
+
+          // Marker sizes are expressed as a Size of X,Y where the origin of the image
+          // (0,0) is located in the top left of the image.
+
+          // Origins, anchor positions and coordinates of the marker increase in the X
+          // direction to the right and in the Y direction down.
+          var image = {
+            url: 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png',
+            // This marker is 20 pixels wide by 32 pixels high.
+            size: new google.maps.Size(20, 32),
+            // The origin for this image is (0, 0).
+            origin: new google.maps.Point(0, 0),
+            // The anchor for this image is the base of the flagpole at (0, 32).
+            anchor: new google.maps.Point(0, 32)
+          };
+          // Shapes define the clickable region of the icon. The type defines an HTML
+          // <area> element 'poly' which traces out a polygon as a series of X,Y points.
+          // The final coordinate closes the poly by connecting to the first coordinate.
+          var shape = {
+            coords: [1, 1, 1, 20, 18, 20, 18, 1],
+            type: 'poly'
+          };
+          for (var i = 0; i < beaches.length; i++) {
+            var beach = beaches[i];
+            var marker = new google.maps.Marker({
+              position: {lat: beach[1], lng: beach[2]},
+              map: map,
+              icon: image,
+              shape: shape,
+              title: beach[0],
+              zIndex: beach[3]
+            });
+          }
+        }
+
+        function calculateAndDisplayRoute(directionsService, directionsDisplay) {
+          directionsService.route({
+            origin: {lat: init_lat, lng: init_lng},  // Haight.
+            destination: {lat: beaches[0][1], lng: beaches[0][2]},  // Ocean Beach.
+            // Note that Javascript allows us to access the constant
+            // using square brackets and a string value as its
+            // "property."
+            travelMode: google.maps.TravelMode["DRIVING"]
+          }, function(response, status) {
+            if (status == google.maps.DirectionsStatus.OK) {
+              directionsDisplay.setDirections(response);
+            } else {
+              window.alert('Directions request failed due to ' + status);
+            }
+          });
+        }        
       google.maps.event.addDomListener(window, 'load', initialize);
     </script>
 
