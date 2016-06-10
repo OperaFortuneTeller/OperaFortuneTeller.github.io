@@ -51,36 +51,86 @@
         var directionsService;
         var trafficLayer; 
 
-        var markers = []
+        var searchBox;
+        var sourceMarkers = [];
+        var targetMarkers = [];
+        var currentMarker;
+        var currentPosition;
         
-
-        function initialize() {
+        function initAutocomplete() {
           map = new google.maps.Map(document.getElementById('map'), {
-            zoom: 11,
+            zoom: init_zoom,
             center: init_center
           });
 
-          currentLocation = new google.maps.Marker({
+          currentMarker = new google.maps.Marker({
               map: map,
-              draggable: true,
+              draggable: false,
               animation: google.maps.Animation.DROP,
               position: init_center
           });
-
+          currentPosition = init_center;
+          currentMarker.addListener('click', toggleBounce);
+          sourceMarkers.push(currentMarker); 
+          
           directionsDisplay = new google.maps.DirectionsRenderer;
           directionsService = new google.maps.DirectionsService;
           trafficLayer = new google.maps.TrafficLayer();
-          currentLocation.addListener('click', toggleBounce);        
           directionsDisplay.setMap(map);
           directionsDisplay.setOptions( { suppressMarkers: true } );
-          setMarkers(map);        
+          setMarkers(map);  
+
+          // Create the search box and link it to the UI element.
+          var input = document.getElementById('location');
+          searchBox = new google.maps.places.SearchBox(input);
+          //map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+
+          // Bias the SearchBox results towards current map's viewport.
+          map.addListener('bounds_changed', function() {
+            searchBox.setBounds(map.getBounds());
+          });
+        }
+
+        function places_changed() {
+          var places = searchBox.getPlaces();
+          if (places.length == 0) {
+            return;
+          }
+
+          // Clear out the old sourceMarkers.
+          sourceMarkers.forEach(function(marker) {
+            marker.setMap(null);
+          });
+          sourceMarkers = [];
+
+          // For each place, get the icon, name and location.
+          var bounds = new google.maps.LatLngBounds();
+          places.forEach(function(place) {
+            currentMarker = new google.maps.Marker({
+              map: map,
+              draggable: false,
+              animation: google.maps.Animation.DROP,
+              position: place.geometry.location
+            });
+            currentPosition = place.geometry.location;
+            currentMarker.addListener('click', toggleBounce); 
+            sourceMarkers.push(currentMarker);
+            if (place.geometry.viewport) {
+              // Only geocodes have viewport.
+              bounds.union(place.geometry.viewport);
+            } else {
+              bounds.extend(place.geometry.location);
+            }
+          });
+          map.fitBounds(bounds);
+          map.setZoom(init_zoom);
         }
 
         function toggleBounce() {
-          if (currentLocation.getAnimation() !== null) {
-            currentLocation.setAnimation(null);
+          if (currentMarker.getAnimation() !== null) {
+            currentMarker.setAnimation(null);
           } else {
-            currentLocation.setAnimation(google.maps.Animation.BOUNCE);
+            currentMarker.setAnimation(google.maps.Animation.BOUNCE);
           }
         }
 
@@ -94,13 +144,7 @@
           // Origins, anchor positions and coordinates of the marker increase in the X
           // direction to the right and in the Y direction down.
           var image = {
-            url: 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png',
-            // This marker is 20 pixels wide by 32 pixels high.
-            size: new google.maps.Size(20, 32),
-            // The origin for this image is (0, 0).
-            origin: new google.maps.Point(0, 0),
-            // The anchor for this image is the base of the flagpole at (0, 32).
-            anchor: new google.maps.Point(0, 32)
+            url: './green-dot.png'
           };
           // Shapes define the clickable region of the icon. The type defines an HTML
           // <area> element 'poly' which traces out a polygon as a series of X,Y points.
@@ -112,7 +156,7 @@
           var i;
           for (i = 0; i < beaches.length; i++) {
             var beach = beaches[i];
-            markers[i] = new google.maps.Marker({
+            targetMarkers[i] = new google.maps.Marker({
               position: {lat: beach[1], lng: beach[2]},
               map: map,
               icon: image,
@@ -120,7 +164,7 @@
               title: beach[0],
               zIndex: beach[3]
             });
-            markers[i].addListener('click', makeItHappenDelegate(beach));
+            targetMarkers[i].addListener('click', makeItHappenDelegate(beach));
           }
         }
 
@@ -131,7 +175,7 @@
         }        
         function showRoute(bb) {
           directionsService.route({
-            origin: {lat: init_lat, lng: init_lng},  // Haight.
+            origin: currentPosition,  // Haight.
             destination: {lat: bb[1], lng: bb[2]},  // Ocean Beach.
             // Note that Javascript allows us to access the constant
             // using square brackets and a string value as its
@@ -151,7 +195,7 @@
           orignalValue = parseInt(document.getElementById("gap"+i).innerHTML);
           
           if (text == cancelStr) {
-            trafficLayer.setMap(null);
+            //trafficLayer.setMap(null);
             
             document.getElementById("button"+i).innerHTML = confirmStr;
             document.getElementById("gap"+i).innerHTML = orignalValue+1;
@@ -159,7 +203,7 @@
             map.setCenter(init_center);
             map.setZoom(init_zoom);
           } else {
-            trafficLayer.setMap(map);
+            //trafficLayer.setMap(map);
             
             if(current_confirm >= 0) {
               orignalValueForCurrentConfirm = parseInt(document.getElementById("gap"+current_confirm).innerHTML);
@@ -172,68 +216,7 @@
             current_confirm = i;
           }         
         }
-
-        function xxx() {
-          window.alert("haha");
-        }
-
-        function initAutocomplete() {
-          initialize();
-          // Create the search box and link it to the UI element.
-          var input = document.getElementById('location');
-          var searchBox = new google.maps.places.SearchBox(input);
-          //map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
-
-          // Bias the SearchBox results towards current map's viewport.
-          map.addListener('bounds_changed', function() {
-            searchBox.setBounds(map.getBounds());
-          });
-
-          var markers2 = [];
-          // Listen for the event fired when the user selects a prediction and retrieve
-          // more details for that place.
-          searchBox.addListener('places_changed', function() {
-            var places = searchBox.getPlaces();
-
-            if (places.length == 0) {
-              return;
-            }
-
-            // Clear out the old markers.
-            markers2.forEach(function(marker) {
-              marker.setMap(null);
-            });
-            markers2 = [];
-
-            // For each place, get the icon, name and location.
-            var bounds = new google.maps.LatLngBounds();
-            places.forEach(function(place) {
-              var icon = {
-                url: place.icon,
-                size: new google.maps.Size(71, 71),
-                origin: new google.maps.Point(0, 0),
-                anchor: new google.maps.Point(17, 34),
-                scaledSize: new google.maps.Size(25, 25)
-              };
-
-              // Create a marker for each place.
-              markers2.push(new google.maps.Marker({
-                map: map,
-                icon: icon,
-                title: place.name,
-                position: place.geometry.location
-              }));
-
-              if (place.geometry.viewport) {
-                // Only geocodes have viewport.
-                bounds.union(place.geometry.viewport);
-              } else {
-                bounds.extend(place.geometry.location);
-              }
-            });
-            map.fitBounds(bounds);
-          });
-        }
+        
        
       //google.maps.event.addDomListener(window, 'load', initialize);
     </script>
@@ -317,7 +300,7 @@
                     <div id="map"></div>
                     <!--/#map-->
                     <div class="search-bar horizontal">
-                      <input style="width:300px;margin-left:10px" type="text" class="form-control2" id="location" placeholder="Enter Location">
+                      <input style="width:400px;margin-left:10px" type="text" class="form-control2" id="location" placeholder="Enter Location (Current Location by default)">
                       <select id="timeSelection" style="width:100px;height:35px;margin-left:10px" placeholder="Enter Time">
                         <option value="0">Now</option>
                         <option value="1">+0.5 hour</option>
@@ -325,7 +308,7 @@
                         <option value="3">+1.5 hours</option>
                         <option value="4">+2 hours</option>                                 
                       </select>                      
-                      <button type="button" style="margin-left:10px" onclick="xxx()" class="btn btn-default"><i class="fa fa-search"></i></button>
+                      <button type="button" style="margin-left:10px" onclick="places_changed()" class="btn btn-default"><i class="fa fa-search"></i></button>
                         <!-- /.main-search -->
                     </div>
                     <!-- /.search-bar -->
