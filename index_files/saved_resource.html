@@ -114,7 +114,6 @@
               zIndex: beach[3]
             });
             markers[i].addListener('click', makeItHappenDelegate(beach));
-
           }
         }
 
@@ -257,7 +256,7 @@
                             <h3>Recommendations</h3>
                         </header>
                         <ul class="results list">
-                            <li><div class="item" id="1"><a href="http://themestarz.net/html/spotter/index-directory.html#" class="image loaded"><div class="inner"><div class="item-specific"><span title="Demand"><img src="./Demand.png" class="mCS_img_loaded">560</span><span title="Supply"><img src="./Supply.png" class="mCS_img_loaded">380</span><span title="Gap"><img src="./Gap.png" class="mCS_img_loaded">180</span></div><img src="./1.jpg" alt="" class="mCS_img_loaded"></div></a><div class="wrapper"><a href="http://themestarz.net/html/spotter/index-directory.html#" id="1"><h3>JFK Airport</h3></a><div>Demand-supply Gap <div class="price">180</div><img src="./GoodTraff.png" class="mCS_img_loaded"></div><div>Traffic Condition: <div class="weather">23 mi. 30 min</div><img src="./GoodTraff.png" class="mCS_img_loaded"></div><div><h3>Go for it!</h3></div></div></div></li>
+                            <li><div class="item" id="1"><div class="image loaded"><div class="inner"><div class="item-specific"><span title="Demand"><img src="./Demand.png" class="mCS_img_loaded">560</span><span title="Supply"><img src="./Supply.png" class="mCS_img_loaded">380</span><span title="Gap"><img src="./Gap.png" class="mCS_img_loaded">180</span></div><img src="./1.jpg" alt="" class="mCS_img_loaded"></div></div><div class="wrapper"><div id="1"><h3>JFK Airport</h3></div><div>Demand-supply Gap <div class="price">180</div><img src="./GoodTraff.png" class="mCS_img_loaded"></div><div>Traffic Condition: <div class="weather">23 mi. 30 min</div><img src="./GoodTraff.png" class="mCS_img_loaded"></div><div onclick="window.alert(beaches[0])"><h3>Go for it!</h3></div></div></div></li>
 
                             <li><div class="item" id="2"><a href="http://themestarz.net/html/spotter/index-directory.html#" class="image loaded"><div class="inner"><div class="item-specific"><span>Menu from: $6.50</span></div><img src="./2.jpg" alt="" class="mCS_img_loaded"></div></a><div class="wrapper"><a href="http://themestarz.net/html/spotter/index-directory.html#" id="2"><h3>Times Square</h3></a><figure>1882 Trainer Avenue</figure><div class="price">48</div><div class="info"><div class="type"><i><img src="./bags.png" alt="" class="mCS_img_loaded"></i><span>Restaurant</span></div><div class="rating" data-rating="5"><span class="stars"><i class="fa fa-star s1 active" data-score="1"></i><i class="fa fa-star s2 active" data-score="2"></i><i class="fa fa-star s3 active" data-score="3"></i><i class="fa fa-star s4 active" data-score="4"></i><i class="fa fa-star s5 active" data-score="5"></i></span><span class="stars"><i class="fa fa-star s1 active" data-score="1"></i><i class="fa fa-star s2 active" data-score="2"></i><i class="fa fa-star s3 active" data-score="3"></i><i class="fa fa-star s4 active" data-score="4"></i><i class="fa fa-star s5 active" data-score="5"></i></span></div></div></div></div></li>
 
@@ -302,72 +301,11 @@
 <script type="text/javascript" src="./custom.js"></script>
 <script type="text/javascript" src="./maps.js"></script>
 
-
-<!-- <div class="modal-window fade_in">
-    <div class="modal-wrapper"><h2>This is System News</h2>
-        <figure>63 Birch Street</figure>
-        <div class="rating" data-rating="4"><span class="stars"><i class="fa fa-star s1 active" data-score="1"></i><i class="fa fa-star s2 active" data-score="2"></i><i class="fa fa-star s3 active" data-score="3"></i><i class="fa fa-star s4 active" data-score="4"></i><i class="fa fa-star s5" data-score="5"></i></span></div>
-        <div class="modal-body">
-            <div class="gallery">
-                <div class="image">
-                    <div class="price">$2500</div>
-                    <div class="type"><i><img src="./restaurant.png" alt=""></i><span>Apartment</span></div>
-                    <div class="owl-carousel gallery owl-theme owl-loaded">
-                        
-                        
-                        
-                    <div class="owl-stage-outer"><div class="owl-stage" style="width: 1050px; transform: translate3d(0px, 0px, 0px); transition: 0s;"><div class="owl-item active" style="width: 350px; margin-right: 0px;"><img src="./1.jpg"></div><div class="owl-item" style="width: 350px; margin-right: 0px;"><img src="./5.jpg"></div><div class="owl-item" style="width: 350px; margin-right: 0px;"><img src="./4.jpg"></div></div></div><div class="owl-controls"><div class="owl-nav"><div class="owl-prev" style=""></div><div class="owl-next" style=""></div></div><div class="owl-dots" style=""><div class="owl-dot active"><span></span></div><div class="owl-dot"><span></span></div><div class="owl-dot"><span></span></div></div></div></div>
-                </div>
-                <div class="features"><h3>Features</h3>
-                    <ul class="bullets">
-                        <li>Free Parking</li>
-                        <li>Cards Accepted</li>
-                        <li>Wi-Fi</li>
-                        <li>Air Condition</li>
-                        <li>Reservations</li>
-                        <li>Teambuildings</li>
-                        <li>Places to seat</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="modal-content">
-                <section><h3>Description</h3>
-                    <p>
-                        Curabitur odio nibh, luctus non pulvinar a, ultricies ac diam. Donec neque
-                        massa, viverra interdum eros ut, imperdiet pellentesque mauris. Proin sit amet scelerisque
-                        risus. Donec semper semper erat ut mollis. Curabitur suscipit, justo eu dignissim lacinia, ante
-                        sapien pharetra duin consectetur eros augue sed ex. Donec a odio rutrum, hendrerit sapien vitae,
-                        euismod arcu.
-                    </p>
-                </section>
-                <section><h3>Overview</h3>
-                    <dl>
-                        <dt>Bedrooms</dt>
-                        <dd>2</dd>
-                        <dt>Bedrooms</dt>
-                        <dd>2</dd>
-                        <dt>Area</dt>
-                        <dd>240</dd>
-                        <dt>Garages</dt>
-                        <dd>1</dd>
-                    </dl>
-                </section>
-                <section><h3>Last Review</h3>
-                    <div class="rating" data-rating="5"><span class="stars"><i class="fa fa-star s1 active" data-score="1"></i><i class="fa fa-star s2 active" data-score="2"></i><i class="fa fa-star s3 active" data-score="3"></i><i class="fa fa-star s4 active" data-score="4"></i><i class="fa fa-star s5 active" data-score="5"></i></span></div>
-                    <p>Curabitur odio nibh, luctus non pulvinar a, ultricies ac diam. Donec neque massa, viverra interdum eros ut, imperdiet</p>
-                </section>
-                <a href="http://themestarz.net/html/spotter/item-detail.html" class="btn btn-default btn-large">Show Detail</a></div>
-        </div>
-        <div class="modal-close"><img src="./close.png"></div>
-    </div>
-    <div class="modal-background fade_in"></div>
-</div> -->
-
 <script>
     // Render Owl carousel gallery
 
     var _rtl = false;
-    drawOwlCarousel(_rtl);
+    //drawOwlCarousel(_rtl);
 
     // Render Rating stars
 
