@@ -33,6 +33,8 @@
         var init_center = {lat: init_lat, lng: init_lng};
         var init_zoom = 11;
         var current_confirm = -1;
+        var confirmStr = "Go for it!";
+        var cancelStr = "Cancel";
         
         // order in which these markers should display on top of each other.
         var beaches = [
@@ -146,8 +148,8 @@
           var text = document.getElementById("button"+i).innerHTML;
           orignalValue = parseInt(document.getElementById("gap"+i).innerHTML);
           
-          if (text == "cancel") {
-            document.getElementById("button"+i).innerHTML = "Go for it!";
+          if (text == cancelStr) {
+            document.getElementById("button"+i).innerHTML = confirmStr;
             document.getElementById("gap"+i).innerHTML = orignalValue+1;
             current_confirm = -1;
             map.setCenter(init_center);
@@ -155,10 +157,10 @@
           } else {
             if(current_confirm >= 0) {
               orignalValueForCurrentConfirm = parseInt(document.getElementById("gap"+current_confirm).innerHTML);
-              document.getElementById("button"+current_confirm).innerHTML = "Go for it!";
+              document.getElementById("button"+current_confirm).innerHTML = confirmStr;
               document.getElementById("gap"+current_confirm).innerHTML = orignalValueForCurrentConfirm+1;
             }
-            document.getElementById("button"+i).innerHTML = "cancel";
+            document.getElementById("button"+i).innerHTML = cancelStr;
             document.getElementById("gap"+i).innerHTML = orignalValue-1;
             showRoute(beaches[i])
             current_confirm = i;
