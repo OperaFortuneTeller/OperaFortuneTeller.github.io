@@ -549,15 +549,15 @@ function drawItemSpecific(category, json, a){
 // Quick View ----------------------------------------------------------------------------------------------------------
 
 function quickView(id){
-    $.ajax({
-        type: 'POST',
-        url: 'assets/external/_modal.html',
-        data: id,
-        success: function (data) {
-            // Create HTML element with loaded data
-            $('body').append(data);
-        }
-    });
+    // $.ajax({
+    //     type: 'POST',
+    //     url: 'assets/external/_modal.html',
+    //     data: id,
+    //     success: function (data) {
+    //         // Create HTML element with loaded data
+    //         $('body').append(data);
+    //     }
+    // });
 }
 
 // Adapt background height to block element ----------------------------------------------------------------------------
