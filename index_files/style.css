@@ -1894,14 +1894,14 @@ ul.bullets li a:hover {
   position: relative;
   left: 10px;
 }
-.item .price {
+.item .redrec {
   -moz-border-radius: 0px;
   -webkit-border-radius: 0px;
   border-radius: 0px;
   -moz-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.05);
   -webkit-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.05);
   box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.05);
-  background-color: #ff513f;
+  background-color: #ff0000;
   color: #fff;
   display: inline-block;
   font-family: 'Montserrat', sans-serif;
@@ -1911,7 +1911,7 @@ ul.bullets li a:hover {
   text-align: center;
   padding: 4px 8px;
 }
-.item .weather {
+.item .greenrec {
   -moz-border-radius: 0px;
   -webkit-border-radius: 0px;
   border-radius: 0px;
@@ -1920,6 +1920,23 @@ ul.bullets li a:hover {
   box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.05);
   background-color: #00ff66;
   color: #fff;
+  display: inline-block;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: bold;
+  margin-top: 5px;
+  text-align: center;
+  padding: 4px 8px;
+}
+.item .yellowrec {
+  -moz-border-radius: 0px;
+  -webkit-border-radius: 0px;
+  border-radius: 0px;
+  -moz-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.05);
+  -webkit-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.05);
+  background-color: #ffff00;
+  color: #000000;
   display: inline-block;
   font-family: 'Montserrat', sans-serif;
   font-size: 12px;
