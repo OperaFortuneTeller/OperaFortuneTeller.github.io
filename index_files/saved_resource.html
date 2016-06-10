@@ -30,6 +30,7 @@
         var labelIndex = 0;
         var init_lat = 40.7313752;
         var init_lng = -73.9249603;
+        var current_confirm = -1;
 
         // order in which these markers should display on top of each other.
         var beaches = [
@@ -45,13 +46,9 @@
         var directionsService = new google.maps.DirectionsService;
 
         function initialize() {
-        var nyc = { lat: init_lat, lng: init_lng };
-        //var directionsDisplay = new google.maps.DirectionsRenderer;
-        //var directionsService = new google.maps.DirectionsService;
-
         var map = new google.maps.Map(document.getElementById('map'), {
           zoom: 11,
-          center: nyc
+          center: { lat: init_lat, lng: init_lng }
         });
 
         currentLocation = new google.maps.Marker({
@@ -62,10 +59,11 @@
         });
         currentLocation.addListener('click', toggleBounce);        
         directionsDisplay.setMap(map);
+        directionsDisplay.setOptions( { suppressMarkers: true } );
         setMarkers(map);
 
-        var trafficLayer = new google.maps.TrafficLayer();
-        trafficLayer.setMap(map);
+        //var trafficLayer = new google.maps.TrafficLayer();
+        //trafficLayer.setMap(map);
         
         }
 
@@ -137,6 +135,27 @@
               window.alert('Directions request failed due to ' + status);
             }
           });
+        }
+
+        function confirmGo(i) {
+          var text = document.getElementById("button"+i).innerHTML;
+          orignalValue = parseInt(document.getElementById("gap"+i).innerHTML);
+          
+          if (text == "cancel") {
+            document.getElementById("button"+i).innerHTML = "Go for it!";
+            document.getElementById("gap"+i).innerHTML = orignalValue+1;
+            current_confirm = -1;
+          } else {
+            if(current_confirm >= 0) {
+              orignalValueForCurrentConfirm = parseInt(document.getElementById("gap"+current_confirm).innerHTML);
+              document.getElementById("button"+current_confirm).innerHTML = "Go for it!";
+              document.getElementById("gap"+current_confirm).innerHTML = orignalValueForCurrentConfirm+1;
+            }
+            document.getElementById("button"+i).innerHTML = "cancel";
+            document.getElementById("gap"+i).innerHTML = orignalValue-1;
+            showRoute(beaches[i])
+            current_confirm = i;
+          }         
         }
        
       google.maps.event.addDomListener(window, 'load', initialize);
@@ -255,9 +274,9 @@
                             <h3>Recommendations</h3>
                         </header>
                         <ul class="results list">
-                            <li><div class="item" id="1"><div class="image loaded"><div class="inner"><div class="item-specific"><span title="Demand"><img src="./Demand.png" class="mCS_img_loaded">560</span><span title="Supply"><img src="./Supply.png" class="mCS_img_loaded">380</span><span title="Gap"><img src="./Gap.png" class="mCS_img_loaded">180</span></div><img src="./1.jpg" alt="" class="mCS_img_loaded"></div></div><div class="wrapper"><div id="1"><h3>JFK Airport</h3></div><div>Demand-supply Gap <div class="price">180</div><img src="./GoodTraff.png" class="mCS_img_loaded"></div><div>Traffic Condition: <div class="weather">23 mi. 30 min</div><img src="./GoodTraff.png" class="mCS_img_loaded"></div><div onclick="showRoute(beaches[0])"><h3>Go for it!</h3></div></div></div></li>
+                            <li><div class="item" id="1"><div class="image loaded"><div class="inner"><div class="item-specific"><span title="Demand"><img src="./Demand.png" class="mCS_img_loaded">560</span><span title="Supply"><img src="./Supply.png" class="mCS_img_loaded">380</span><span title="Gap"><img src="./Gap.png" class="mCS_img_loaded">180</span></div><img src="./1.jpg" alt="" class="mCS_img_loaded"></div></div><div class="wrapper"><div id="1"><h3>JFK Airport</h3></div><div>Demand-supply Gap <div id="gap0" class="price">180</div><img src="./GoodTraff.png" class="mCS_img_loaded"></div><div>Traffic Condition: <div class="weather">23 mi. 30 min</div><img src="./GoodTraff.png" class="mCS_img_loaded"></div><button id="button0" onclick="confirmGo(0)">Go for it!</button></div></div></li>
 
-                            <li><div class="item" id="2"><a href="http://themestarz.net/html/spotter/index-directory.html#" class="image loaded"><div class="inner"><div class="item-specific"><span>Menu from: $6.50</span></div><img src="./2.jpg" alt="" class="mCS_img_loaded"></div></a><div class="wrapper"><a href="http://themestarz.net/html/spotter/index-directory.html#" id="2"><h3>Times Square</h3></a><figure>1882 Trainer Avenue</figure><div class="price">48</div><div class="info"><div class="type"><i><img src="./bags.png" alt="" class="mCS_img_loaded"></i><span>Restaurant</span></div><div class="rating" data-rating="5"><span class="stars"><i class="fa fa-star s1 active" data-score="1"></i><i class="fa fa-star s2 active" data-score="2"></i><i class="fa fa-star s3 active" data-score="3"></i><i class="fa fa-star s4 active" data-score="4"></i><i class="fa fa-star s5 active" data-score="5"></i></span><span class="stars"><i class="fa fa-star s1 active" data-score="1"></i><i class="fa fa-star s2 active" data-score="2"></i><i class="fa fa-star s3 active" data-score="3"></i><i class="fa fa-star s4 active" data-score="4"></i><i class="fa fa-star s5 active" data-score="5"></i></span></div></div></div></div></li>
+                            <li><div class="item" id="2"><a href="http://themestarz.net/html/spotter/index-directory.html#" class="image loaded"><div class="inner"><div class="item-specific"><span>Menu from: $6.50</span></div><img src="./2.jpg" alt="" class="mCS_img_loaded"></div></a><div class="wrapper"><a href="http://themestarz.net/html/spotter/index-directory.html#" id="2"><h3>Times Square</h3></a><figure>1882 Trainer Avenue</figure><div id="gap1" class="price">48</div><div class="info"><div class="type"><i><img src="./bags.png" alt="" class="mCS_img_loaded"></i><span>Restaurant</span></div><div class="rating" data-rating="5"><span class="stars"><i class="fa fa-star s1 active" data-score="1"></i><i class="fa fa-star s2 active" data-score="2"></i><i class="fa fa-star s3 active" data-score="3"></i><i class="fa fa-star s4 active" data-score="4"></i><i class="fa fa-star s5 active" data-score="5"></i></span><span class="stars"><i class="fa fa-star s1 active" data-score="1"></i><i class="fa fa-star s2 active" data-score="2"></i><i class="fa fa-star s3 active" data-score="3"></i><i class="fa fa-star s4 active" data-score="4"></i><i class="fa fa-star s5 active" data-score="5"></i></span></div></div><button id="button1" onclick="confirmGo(1)">Go for it!</button></div></div></li>
 
                             <li><div class="item" id="3"><a href="http://themestarz.net/html/spotter/index-directory.html#" class="image loaded"><div class="inner"><div class="item-specific"></div><img src="./3.jpg" alt="" class="mCS_img_loaded"></div></a><div class="wrapper"><a href="http://themestarz.net/html/spotter/index-directory.html#" id="3"><h3>LaGuardia Airport</h3></a><figure>1882 Trainer Avenue</figure><div class="price">36</div><div class="info"><div class="type"><i><img src="./clothers_male.png" alt="" class="mCS_img_loaded"></i><span>Restaurant</span></div><div class="rating" data-rating="2"><span class="stars"><i class="fa fa-star s1 active" data-score="1"></i><i class="fa fa-star s2 active" data-score="2"></i><i class="fa fa-star s3" data-score="3"></i><i class="fa fa-star s4" data-score="4"></i><i class="fa fa-star s5" data-score="5"></i></span><span class="stars"><i class="fa fa-star s1 active" data-score="1"></i><i class="fa fa-star s2 active" data-score="2"></i><i class="fa fa-star s3" data-score="3"></i><i class="fa fa-star s4" data-score="4"></i><i class="fa fa-star s5" data-score="5"></i></span></div></div></div></div></li>
 
