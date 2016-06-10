@@ -13,7 +13,6 @@
     <link rel="stylesheet" href="./jquery.mCustomScrollbar.css" type="text/css">
     <link rel="stylesheet" href="./style.css" type="text/css">
     <link rel="stylesheet" href="./user.style.css" type="text/css">
-
     <title>Alpha Drive - Fortune Teller</title>
 <style>
       html, body {
@@ -166,12 +165,12 @@
                             <li><a href="http://themestarz.net/html/spotter/sign-in.html">Sign In</a></li>
                             <li><a href="http://themestarz.net/html/spotter/register.html"><strong>Register</strong></a></li>
                         </ul>
-                        <a href="http://themestarz.net/html/spotter/submit.html" class="submit-item">
-                            <div class="content"><span>Submit Your Item</span></div>
+                        <div onclick="showNews()" class="submit-item">
+                            <div class="content"><span>System News</span></div>
                             <div class="icon">
                                 <i class="fa fa-plus"></i>
                             </div>
-                        </a>
+                        </div>
                         <div class="toggle-navigation">
                             <div class="icon">
                                 <div class="line"></div>
@@ -303,6 +302,148 @@
 <script type="text/javascript" src="./custom.js"></script>
 <script type="text/javascript" src="./maps.js"></script>
 
+
+<!-- <div class="modal-window fade_in">
+    <div class="modal-wrapper"><h2>This is System News</h2>
+        <figure>63 Birch Street</figure>
+        <div class="rating" data-rating="4"><span class="stars"><i class="fa fa-star s1 active" data-score="1"></i><i class="fa fa-star s2 active" data-score="2"></i><i class="fa fa-star s3 active" data-score="3"></i><i class="fa fa-star s4 active" data-score="4"></i><i class="fa fa-star s5" data-score="5"></i></span></div>
+        <div class="modal-body">
+            <div class="gallery">
+                <div class="image">
+                    <div class="price">$2500</div>
+                    <div class="type"><i><img src="./restaurant.png" alt=""></i><span>Apartment</span></div>
+                    <div class="owl-carousel gallery owl-theme owl-loaded">
+                        
+                        
+                        
+                    <div class="owl-stage-outer"><div class="owl-stage" style="width: 1050px; transform: translate3d(0px, 0px, 0px); transition: 0s;"><div class="owl-item active" style="width: 350px; margin-right: 0px;"><img src="./1.jpg"></div><div class="owl-item" style="width: 350px; margin-right: 0px;"><img src="./5.jpg"></div><div class="owl-item" style="width: 350px; margin-right: 0px;"><img src="./4.jpg"></div></div></div><div class="owl-controls"><div class="owl-nav"><div class="owl-prev" style=""></div><div class="owl-next" style=""></div></div><div class="owl-dots" style=""><div class="owl-dot active"><span></span></div><div class="owl-dot"><span></span></div><div class="owl-dot"><span></span></div></div></div></div>
+                </div>
+                <div class="features"><h3>Features</h3>
+                    <ul class="bullets">
+                        <li>Free Parking</li>
+                        <li>Cards Accepted</li>
+                        <li>Wi-Fi</li>
+                        <li>Air Condition</li>
+                        <li>Reservations</li>
+                        <li>Teambuildings</li>
+                        <li>Places to seat</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-content">
+                <section><h3>Description</h3>
+                    <p>
+                        Curabitur odio nibh, luctus non pulvinar a, ultricies ac diam. Donec neque
+                        massa, viverra interdum eros ut, imperdiet pellentesque mauris. Proin sit amet scelerisque
+                        risus. Donec semper semper erat ut mollis. Curabitur suscipit, justo eu dignissim lacinia, ante
+                        sapien pharetra duin consectetur eros augue sed ex. Donec a odio rutrum, hendrerit sapien vitae,
+                        euismod arcu.
+                    </p>
+                </section>
+                <section><h3>Overview</h3>
+                    <dl>
+                        <dt>Bedrooms</dt>
+                        <dd>2</dd>
+                        <dt>Bedrooms</dt>
+                        <dd>2</dd>
+                        <dt>Area</dt>
+                        <dd>240</dd>
+                        <dt>Garages</dt>
+                        <dd>1</dd>
+                    </dl>
+                </section>
+                <section><h3>Last Review</h3>
+                    <div class="rating" data-rating="5"><span class="stars"><i class="fa fa-star s1 active" data-score="1"></i><i class="fa fa-star s2 active" data-score="2"></i><i class="fa fa-star s3 active" data-score="3"></i><i class="fa fa-star s4 active" data-score="4"></i><i class="fa fa-star s5 active" data-score="5"></i></span></div>
+                    <p>Curabitur odio nibh, luctus non pulvinar a, ultricies ac diam. Donec neque massa, viverra interdum eros ut, imperdiet</p>
+                </section>
+                <a href="http://themestarz.net/html/spotter/item-detail.html" class="btn btn-default btn-large">Show Detail</a></div>
+        </div>
+        <div class="modal-close"><img src="./close.png"></div>
+    </div>
+    <div class="modal-background fade_in"></div>
+</div> -->
+
+<script>
+    // Render Owl carousel gallery
+
+    var _rtl = false;
+    drawOwlCarousel(_rtl);
+
+    // Render Rating stars
+
+    rating('.modal-window');
+
+    // Remove modal element form DOM
+
+    $('.modal-window .modal-background, .modal-close').live('click',  function(e){
+        hideNews();
+    });
+
+    function hideNews() {
+      $('.modal-window').addClass('fade_out');
+        setTimeout(function() {
+            $('.modal-window').remove();
+        }, 300);
+    }
+
+    function showNews() {
+      $('body').append('<div class="modal-window fade_in">'+
+'    <div class="modal-wrapper"><h2>This is System News</h2>'+
+'        <figure>63 Birch Street</figure>'+
+'        <div class="rating" data-rating="4"><span class="stars"><i class="fa fa-star s1 active" data-score="1"></i><i class="fa fa-star s2 active" data-score="2"></i><i class="fa fa-star s3 active" data-score="3"></i><i class="fa fa-star s4 active" data-score="4"></i><i class="fa fa-star s5" data-score="5"></i></span></div>'+
+'        <div class="modal-body">'+
+'            <div class="gallery">'+
+'                <div class="image">'+
+'                    <div class="price">$2500</div>'+
+'                    <div class="type"><i><img src="./restaurant.png" alt=""></i><span>Apartment</span></div>'+
+'                    <div class="owl-carousel gallery owl-theme owl-loaded">'+
+'                    <div class="owl-stage-outer"><div class="owl-stage" style="width: 1050px; transform: translate3d(0px, 0px, 0px); transition: 0s;"><div class="owl-item active" style="width: 350px; margin-right: 0px;"><img src="./1.jpg"></div><div class="owl-item" style="width: 350px; margin-right: 0px;"><img src="./5.jpg"></div><div class="owl-item" style="width: 350px; margin-right: 0px;"><img src="./4.jpg"></div></div></div><div class="owl-controls"><div class="owl-nav"><div class="owl-prev" style=""></div><div class="owl-next" style=""></div></div><div class="owl-dots" style=""><div class="owl-dot active"><span></span></div><div class="owl-dot"><span></span></div><div class="owl-dot"><span></span></div></div></div></div>'+
+'                </div>'+
+'                <div class="features"><h3>Features</h3>'+
+'                    <ul class="bullets">'+
+'                        <li>Free Parking</li>'+
+'                        <li>Cards Accepted</li>'+
+'                        <li>Wi-Fi</li>'+
+'                        <li>Air Condition</li>'+
+'                        <li>Reservations</li>'+
+'                        <li>Teambuildings</li>'+
+'                        <li>Places to seat</li>'+
+'                    </ul>'+
+'                </div>'+
+'            </div>'+
+'            <div class="modal-content">'+
+'                <section><h3>Description</h3>'+
+'                    <p>'+
+'                        Curabitur odio nibh, luctus non pulvinar a, ultricies ac diam. Donec neque'+
+'                        massa, viverra interdum eros ut, imperdiet pellentesque mauris. Proin sit amet scelerisque'+
+'                        risus. Donec semper semper erat ut mollis. Curabitur suscipit, justo eu dignissim lacinia, ante'+
+'                        sapien pharetra duin consectetur eros augue sed ex. Donec a odio rutrum, hendrerit sapien vitae'+
+'                    </p>'+
+'                </section>'+
+'                <section><h3>Overview</h3>'+
+'                    <dl>'+
+'                        <dt>Bedrooms</dt>'+
+'                        <dd>2</dd>'+
+'                        <dt>Bedrooms</dt>'+
+'                        <dd>2</dd>'+
+'                        <dt>Area</dt>'+
+'                        <dd>240</dd>'+
+'                        <dt>Garages</dt>'+
+'                        <dd>1</dd>'+
+'                    </dl>'+
+'                </section>'+
+'                <section><h3>Last Review</h3>'+
+'                    <div class="rating" data-rating="5"><span class="stars"><i class="fa fa-star s1 active" data-score="1"></i><i class="fa fa-star s2 active" data-score="2"></i><i class="fa fa-star s3 active" data-score="3"></i><i class="fa fa-star s4 active" data-score="4"></i><i class="fa fa-star s5 active" data-score="5"></i></span></div>'+
+'                    <p>Curabitur odio nibh, luctus non pulvinar a, ultricies ac diam. Donec neque massa, viverra interdum eros ut, imperdiet</p>'+
+'                </section>'+
+'                <div onclick="hideNews()" class="btn btn-default btn-large">Show Detail</div></div>'+
+'        </div>'+
+'        <div class="modal-close"><img src="./close.png"></div>'+
+'    </div>'+
+'    <div class="modal-background fade_in"></div>'+
+'</div>;');
+    }
+</script>
 <!--[if lte IE 9]>
 <script type="text/javascript" src="assets/js/ie-scripts.js"></script>
 <![endif]-->
