@@ -30,21 +30,25 @@
     <script>
         var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         var labelIndex = 0;
-        var init_lat = 40.7166638;//40.7313752;
-        var init_lng = -74.0333247;//-73.9249603;
+        var init_lat = 40.7450809;
+        var init_lng = -73.9953523;
         var init_center = {lat: init_lat, lng: init_lng};
-        var init_zoom = 11;
+        var init_zoom = 14;
         var current_confirm = -1;
         var confirmStr = "Go for it!";
         var cancelStr = "Cancel";
-        
-        // order in which these markers should display on top of each other.
+https://www.google.com/maps/place/Queens+Zoo/@40.7436249,-73.8527027,17z/data=!4m12!1m6!3m5!1s0x89c25fd0af7285af:0x316ffb8a00fb88c0!2sQueens+Zoo!8m2!3d40.7436249!4d-73.850514!3m4!1s0x89c25fd0af7285af:0x316ffb8a00fb88c0!8m2!3d40.7436249!4d-73.850514
         var beaches = [
-          ['JFK', 40.6413111,-73.7781391, 11],
-          ['TSQ', 40.7588954,-73.9851093, 11],
-          ['LGA', 40.7769018,-73.8739586, 11],
-          ['WST', 40.7060006,-74.0109897, 11],
-          ['MMA', 40.7794366,-73.9632654, 11]
+          ['Madison Square Garden', 40.7505045,-73.9934387, init_zoom],
+          ['Empire Building', 40.7484405,-73.9856644, init_zoom],
+          ['Broadway Theatre', 40.7634007,-73.9833833, init_zoom],
+          ['Times Square', 40.7588954,-73.9851093, init_zoom],
+          ['Union Square', 40.735276,-73.9910504, init_zoom],
+          ['LGA', 40.7769018,-73.8739586, init_zoom],
+          ['Museum of the Moving Image', 40.7563454,-73.9239496, init_zoom],
+          ['Queens Zoo', 40.7436249,-73.850514, init_zoom],
+          ['JFK', 40.6413111,-73.7781391, init_zoom],
+          ['Empire Building', 40.7484405,-73.9856644, init_zoom]
         ];
         var map;
         var directionsDisplay;
@@ -123,7 +127,7 @@
             }
           });
           map.fitBounds(bounds);
-          map.setZoom(init_zoom);
+          map.setZoom(11);
         }
 
         function toggleBounce() {
