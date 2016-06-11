@@ -235,7 +235,7 @@ https://www.google.com/maps/place/Queens+Zoo/@40.7436249,-73.8527027,17z/data=!4
             document.getElementById("gap"+i).innerHTML = orignalValue+1;
             current_confirm = -1;
             map.setCenter(init_center);
-            map.setZoom(init_zoom);
+            map.setZoom(scenarioNum%2 == 0 ? init_zoom:11);
           } else {
             //trafficLayer.setMap(map);
             
