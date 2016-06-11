@@ -67,7 +67,6 @@ https://www.google.com/maps/place/Queens+Zoo/@40.7436249,-73.8527027,17z/data=!4
             zoom: init_zoom,
             center: init_center
           });
-
           currentMarker = new google.maps.Marker({
               map: map,
               draggable: false,
@@ -100,39 +99,43 @@ https://www.google.com/maps/place/Queens+Zoo/@40.7436249,-73.8527027,17z/data=!4
           scenarioNum++;
           showList();
           var places = searchBox.getPlaces();
-          if (places.length == 0) {
-            //Back to default
-            return;
-          }
-
           // Clear out the old sourceMarkers.
           sourceMarkers.forEach(function(marker) {
             marker.setMap(null);
           });
           sourceMarkers = [];
-
-          // For each place, get the icon, name and location.
-          var bounds = new google.maps.LatLngBounds();
-          places.forEach(function(place) {
-            currentMarker = new google.maps.Marker({
-              map: map,
-              draggable: false,
-              animation: google.maps.Animation.DROP,
-              position: place.geometry.location
+          if (document.getElementById("location").value == ""){
+            initAutocomplete();
+            return;
+          }
+          
+          if (places.length == 0) {
+            return;
+          } else {            
+            // For each place, get the icon, name and location.
+            var bounds = new google.maps.LatLngBounds();
+            places.forEach(function(place) {
+              currentMarker = new google.maps.Marker({
+                map: map,
+                draggable: false,
+                animation: google.maps.Animation.DROP,
+                position: place.geometry.location
+              });
+              currentPosition = place.geometry.location;
+              currentMarker.addListener('click', toggleBounce); 
+              sourceMarkers.push(currentMarker);
+              if (place.geometry.viewport) {
+                // Only geocodes have viewport.
+                bounds.union(place.geometry.viewport);
+              } else {
+                bounds.extend(place.geometry.location);
+              }
             });
-            currentPosition = place.geometry.location;
-            currentMarker.addListener('click', toggleBounce); 
-            sourceMarkers.push(currentMarker);
-            if (place.geometry.viewport) {
-              // Only geocodes have viewport.
-              bounds.union(place.geometry.viewport);
-            } else {
-              bounds.extend(place.geometry.location);
-            }
-          });
-          map.fitBounds(bounds);
-          map.setZoom(11);
-          setMarkers(map);
+            map.fitBounds(bounds);
+            map.setZoom(scenarioNum%2==0?init_zoom:11);
+            setMarkers(map);
+          }
+
         }
 
         function toggleBounce() {
@@ -228,7 +231,6 @@ https://www.google.com/maps/place/Queens+Zoo/@40.7436249,-73.8527027,17z/data=!4
           
           if (text == cancelStr) {
             //trafficLayer.setMap(null);
-            
             document.getElementById("button"+i).innerHTML = confirmStr;
             document.getElementById("gap"+i).innerHTML = orignalValue+1;
             current_confirm = -1;
