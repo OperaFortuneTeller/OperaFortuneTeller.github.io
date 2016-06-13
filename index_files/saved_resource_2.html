@@ -39,16 +39,16 @@
         var cancelStr = "Cancel";
 https://www.google.com/maps/place/Queens+Zoo/@40.7436249,-73.8527027,17z/data=!4m12!1m6!3m5!1s0x89c25fd0af7285af:0x316ffb8a00fb88c0!2sQueens+Zoo!8m2!3d40.7436249!4d-73.850514!3m4!1s0x89c25fd0af7285af:0x316ffb8a00fb88c0!8m2!3d40.7436249!4d-73.850514
         var beaches = [
-          ['Madison Square Garden', 40.7505045,-73.9934387, init_zoom],
-          ['Empire Building', 40.7484405,-73.9856644, init_zoom],
-          ['Broadway Theatre', 40.7634007,-73.9833833, init_zoom],
-          ['Times Square', 40.7588954,-73.9851093, init_zoom],
-          ['Union Square', 40.735276,-73.9910504, init_zoom],
-          ['LGA', 40.7769018,-73.8739586, init_zoom],
-          ['Museum of the Moving Image', 40.7563454,-73.9239496, init_zoom],
-          ['Queens Zoo', 40.7436249,-73.850514, init_zoom],
-          ['JFK', 40.6413111,-73.7781391, init_zoom],
-          ['Empire Building', 40.7484405,-73.9856644, init_zoom]
+          ['Madison Square Garden', 40.7505045,-73.9934387, init_zoom, true],
+          ['Empire Building', 40.7484405,-73.9856644, init_zoom, true],
+          ['Broadway Theatre', 40.7634007,-73.9833833, init_zoom, true],
+          ['Times Square', 40.7588954,-73.9851093, init_zoom, true],
+          ['Union Square', 40.735276,-73.9910504, init_zoom, true],
+          ['LGA', 40.7769018,-73.8739586, init_zoom, false],
+          ['Museum of the Moving Image', 40.7563454,-73.9239496, init_zoom, false],
+          ['Queens Zoo', 40.7436249,-73.850514, init_zoom, false],
+          ['JFK', 40.6413111,-73.7781391, init_zoom, false],
+          ['Empire Building', 40.7484405,-73.9856644, init_zoom, false]
         ];
         var map;
         var directionsDisplay;
@@ -60,13 +60,13 @@ https://www.google.com/maps/place/Queens+Zoo/@40.7436249,-73.8527027,17z/data=!4
         var targetMarkers = [];
         var currentMarker;
         var currentPosition;
+        var scenarioNum = 0;
         
         function initAutocomplete() {
           map = new google.maps.Map(document.getElementById('map'), {
             zoom: init_zoom,
             center: init_center
           });
-
           currentMarker = new google.maps.Marker({
               map: map,
               draggable: false,
@@ -96,38 +96,46 @@ https://www.google.com/maps/place/Queens+Zoo/@40.7436249,-73.8527027,17z/data=!4
         }
 
         function places_changed() {
+          scenarioNum++;
+          showList();
           var places = searchBox.getPlaces();
-          if (places.length == 0) {
-            return;
-          }
-
           // Clear out the old sourceMarkers.
           sourceMarkers.forEach(function(marker) {
             marker.setMap(null);
           });
           sourceMarkers = [];
-
-          // For each place, get the icon, name and location.
-          var bounds = new google.maps.LatLngBounds();
-          places.forEach(function(place) {
-            currentMarker = new google.maps.Marker({
-              map: map,
-              draggable: false,
-              animation: google.maps.Animation.DROP,
-              position: place.geometry.location
+          if (document.getElementById("location").value == ""){
+            initAutocomplete();
+            return;
+          }
+          
+          if (places.length == 0) {
+            return;
+          } else {            
+            // For each place, get the icon, name and location.
+            var bounds = new google.maps.LatLngBounds();
+            places.forEach(function(place) {
+              currentMarker = new google.maps.Marker({
+                map: map,
+                draggable: false,
+                animation: google.maps.Animation.DROP,
+                position: place.geometry.location
+              });
+              currentPosition = place.geometry.location;
+              currentMarker.addListener('click', toggleBounce); 
+              sourceMarkers.push(currentMarker);
+              if (place.geometry.viewport) {
+                // Only geocodes have viewport.
+                bounds.union(place.geometry.viewport);
+              } else {
+                bounds.extend(place.geometry.location);
+              }
             });
-            currentPosition = place.geometry.location;
-            currentMarker.addListener('click', toggleBounce); 
-            sourceMarkers.push(currentMarker);
-            if (place.geometry.viewport) {
-              // Only geocodes have viewport.
-              bounds.union(place.geometry.viewport);
-            } else {
-              bounds.extend(place.geometry.location);
-            }
-          });
-          map.fitBounds(bounds);
-          map.setZoom(11);
+            map.fitBounds(bounds);
+            map.setZoom(scenarioNum%2==0?init_zoom:11);
+            setMarkers(map);
+          }
+
         }
 
         function toggleBounce() {
@@ -140,6 +148,13 @@ https://www.google.com/maps/place/Queens+Zoo/@40.7436249,-73.8527027,17z/data=!4
 
 
         function setMarkers(map) {
+
+          // Clear out the old sourceMarkers.
+          targetMarkers.forEach(function(marker) {
+            marker.setMap(null);
+          });
+          targetMarkers = [];
+
           // Adds markers to the map.
 
           // Marker sizes are expressed as a Size of X,Y where the origin of the image
@@ -160,15 +175,31 @@ https://www.google.com/maps/place/Queens+Zoo/@40.7436249,-73.8527027,17z/data=!4
           var i;
           for (i = 0; i < beaches.length; i++) {
             var beach = beaches[i];
-            targetMarkers[i] = new google.maps.Marker({
-              position: {lat: beach[1], lng: beach[2]},
-              map: map,
-              icon: image,
-              shape: shape,
-              title: beach[0],
-              zIndex: beach[3]
-            });
-            targetMarkers[i].addListener('click', makeItHappenDelegate(beach));
+            if (scenarioNum%2 == 0) {
+                if(i<5){
+                  targetMarkers[i] = new google.maps.Marker({
+                    position: {lat: beach[1], lng: beach[2]},
+                    map: map,
+                    icon: image,
+                    shape: shape,
+                    title: beach[0],
+                    //zIndex: beach[3]
+                  });
+                  targetMarkers[i].addListener('click', makeItHappenDelegate(beach));
+                }
+            } else {
+                if(i>=5){
+                  targetMarkers[i] = new google.maps.Marker({
+                    position: {lat: beach[1], lng: beach[2]},
+                    map: map,
+                    icon: image,
+                    shape: shape,
+                    title: beach[0],
+                    //zIndex: beach[3]
+                  });
+                  targetMarkers[i].addListener('click', makeItHappenDelegate(beach));
+                }
+            }
           }
         }
 
@@ -200,12 +231,11 @@ https://www.google.com/maps/place/Queens+Zoo/@40.7436249,-73.8527027,17z/data=!4
           
           if (text == cancelStr) {
             //trafficLayer.setMap(null);
-            
             document.getElementById("button"+i).innerHTML = confirmStr;
             document.getElementById("gap"+i).innerHTML = orignalValue+1;
             current_confirm = -1;
             map.setCenter(init_center);
-            map.setZoom(init_zoom);
+            map.setZoom(scenarioNum%2 == 0 ? init_zoom:11);
           } else {
             //trafficLayer.setMap(map);
             
@@ -220,6 +250,26 @@ https://www.google.com/maps/place/Queens+Zoo/@40.7436249,-73.8527027,17z/data=!4
             current_confirm = i;
           }         
         }
+
+        function showList() {
+          if (scenarioNum%2 == 0) {
+            for (i = 0; i < 10; i++) {
+              if(i < 5) {
+                document.getElementById("li"+i).style.display = "block";
+              } else {
+                document.getElementById("li"+i).style.display = "none";
+              }
+            }              
+          } else {
+            for (i = 0; i < 10; i++) {
+              if(i < 5) {
+                document.getElementById("li"+i).style.display = "none";
+              } else {
+                document.getElementById("li"+i).style.display = "block";
+              }  
+            }
+          }
+       }
         
        
       //google.maps.event.addDomListener(window, 'load', initialize);
@@ -324,25 +374,25 @@ https://www.google.com/maps/place/Queens+Zoo/@40.7436249,-73.8527027,17z/data=!4
                             <h3>Recommendations</h3>
                         </header>
                         <ul class="results list">
-                            <li><div class="item" id="1"><div class="image loaded"><div class="inner"><div class="item-specific"><span title="Demand"><img src="./Demand.png" class="mCS_img_loaded">380</span><span title="Supply"><img src="./Supply.png" class="mCS_img_loaded">220</span><span title="Gap"><img src="./Gap.png" class="mCS_img_loaded">160</span></div><img src="./1.jpg" alt="" class="mCS_img_loaded"></div></div><div class="wrapper"><div id="1"><h3>Madison Square Garden</h3></div><div>Demand-supply Gap <div id="gap0" class="redrec">160</div><img src="./GoodTraff.png" class="mCS_img_loaded"></div><div>Traffic Condition: <div class="greenrec">0.7 mi. 8 min</div><img src="./GoodTraff.png" class="mCS_img_loaded"></div><button id="button0" onclick="confirmGo(0)">Go for it!</button></div></div></li>
+                            <li id="li0" style="display:block;" ><div class="item" id="1"><div class="image loaded"><div class="inner"><div class="item-specific"><span title="Demand"><img src="./Demand.png" class="mCS_img_loaded">380</span><span title="Supply"><img src="./Supply.png" class="mCS_img_loaded">220</span><span title="Gap"><img src="./Gap.png" class="mCS_img_loaded">160</span></div><img src="./1.jpg" alt="" class="mCS_img_loaded"></div></div><div class="wrapper"><div id="1"><h3>Madison Square Garden</h3></div><div>Demand-supply Gap <div id="gap0" class="redrec">160</div><img src="./GoodTraff.png" class="mCS_img_loaded"></div><div>Traffic Condition: <div class="greenrec">0.7 mi. 8 min</div><img src="./GoodTraff.png" class="mCS_img_loaded"></div><button id="button0" onclick="confirmGo(0)">Go for it!</button></div></div></li>
 
-                            <li><div class="item" id="2"><div class="image loaded"><div class="inner"><div class="item-specific"><span title="Demand"><img src="./Demand.png" class="mCS_img_loaded">185</span><span title="Supply"><img src="./Supply.png" class="mCS_img_loaded">103</span><span title="Gap"><img src="./Gap.png" class="mCS_img_loaded">82</span></div><img src="./2.jpg" alt="" class="mCS_img_loaded"></div></div><div class="wrapper"><div id="2"><h3>Empire Building</h3></div><div>Demand-supply Gap <div id="gap0" class="yellowrec">82</div></div><div>Traffic Condition: <div class="greenrec">1.3 mi. 12 min</div><img src="./GoodTraff.png" class="mCS_img_loaded"></div><button id="button0" onclick="confirmGo(0)">Go for it!</button></div></div></li>
+                            <li id="li1"><div class="item" id="2"><div class="image loaded"><div class="inner"><div class="item-specific"><span title="Demand"><img src="./Demand.png" class="mCS_img_loaded">185</span><span title="Supply"><img src="./Supply.png" class="mCS_img_loaded">103</span><span title="Gap"><img src="./Gap.png" class="mCS_img_loaded">82</span></div><img src="./2.jpg" alt="" class="mCS_img_loaded"></div></div><div class="wrapper"><div id="2"><h3>Empire Building</h3></div><div>Demand-supply Gap <div id="gap1" class="yellowrec">82</div></div><div>Traffic Condition: <div class="greenrec">1.3 mi. 12 min</div><img src="./GoodTraff.png" class="mCS_img_loaded"></div><button id="button1" onclick="confirmGo(1)">Go for it!</button></div></div></li>
 
-                            <li><div class="item" id="3"><div class="image loaded"><div class="inner"><div class="item-specific"><span title="Demand"><img src="./Demand.png" class="mCS_img_loaded">270</span><span title="Supply"><img src="./Supply.png" class="mCS_img_loaded">95</span><span title="Gap"><img src="./Gap.png" class="mCS_img_loaded">175</span></div><img src="./4.jpg" alt="" class="mCS_img_loaded"></div></div><div class="wrapper"><div id="3"><h3>Broadway Theatre</h3></div><div>Demand-supply Gap <div id="gap0" class="redrec">175</div><img src="./GoodTraff.png" class="mCS_img_loaded"></div><div>Traffic Condition: <div class="yellowrec">1.9 mi. 23 min</div></div><button id="button0" onclick="confirmGo(0)">Go for it!</button></div></div></li>
+                            <li id="li2"><div class="item" id="3"><div class="image loaded"><div class="inner"><div class="item-specific"><span title="Demand"><img src="./Demand.png" class="mCS_img_loaded">270</span><span title="Supply"><img src="./Supply.png" class="mCS_img_loaded">95</span><span title="Gap"><img src="./Gap.png" class="mCS_img_loaded">175</span></div><img src="./4.jpg" alt="" class="mCS_img_loaded"></div></div><div class="wrapper"><div id="3"><h3>Broadway Theatre</h3></div><div>Demand-supply Gap <div id="gap2" class="redrec">175</div><img src="./GoodTraff.png" class="mCS_img_loaded"></div><div>Traffic Condition: <div class="yellowrec">1.9 mi. 23 min</div></div><button id="button2" onclick="confirmGo(2)">Go for it!</button></div></div></li>
 
-                            <li><div class="item" id="4"><div class="image loaded"><div class="inner"><div class="item-specific"><span title="Demand"><img src="./Demand.png" class="mCS_img_loaded">420</span><span title="Supply"><img src="./Supply.png" class="mCS_img_loaded">280</span><span title="Gap"><img src="./Gap.png" class="mCS_img_loaded">140</span></div><img src="./3.jpg" alt="" class="mCS_img_loaded"></div></div><div class="wrapper"><div id="4"><h3>Time Square</h3></div><div>Demand-supply Gap <div id="gap0" class="redrec">140</div><img src="./GoodTraff.png" class="mCS_img_loaded"></div><div>Traffic Condition: <div class="yellowrec">1.5 mi. 27 min</div></div><button id="button0" onclick="confirmGo(0)">Go for it!</button></div></div></li>
+                            <li id="li3"><div class="item" id="4"><div class="image loaded"><div class="inner"><div class="item-specific"><span title="Demand"><img src="./Demand.png" class="mCS_img_loaded">420</span><span title="Supply"><img src="./Supply.png" class="mCS_img_loaded">280</span><span title="Gap"><img src="./Gap.png" class="mCS_img_loaded">140</span></div><img src="./3.jpg" alt="" class="mCS_img_loaded"></div></div><div class="wrapper"><div id="4"><h3>Time Square</h3></div><div>Demand-supply Gap <div id="gap3" class="redrec">140</div><img src="./GoodTraff.png" class="mCS_img_loaded"></div><div>Traffic Condition: <div class="yellowrec">1.5 mi. 27 min</div></div><button id="button3" onclick="confirmGo(3)">Go for it!</button></div></div></li>
 
-                            <li><div class="item" id="5"><div class="image loaded"><div class="inner"><div class="item-specific"><span title="Demand"><img src="./Demand.png" class="mCS_img_loaded">95</span><span title="Supply"><img src="./Supply.png" class="mCS_img_loaded">45</span><span title="Gap"><img src="./Gap.png" class="mCS_img_loaded">50</span></div><img src="./5.jpg" alt="" class="mCS_img_loaded"></div></div><div class="wrapper"><div id="5"><h3>Union Square</h3></div><div>Demand-supply Gap <div id="gap0" class="greenrec">50</div></div><div>Traffic Condition: <div class="greenrec">1 mi. 6 min</div><img src="./GoodTraff.png" class="mCS_img_loaded"></div><button id="button0" onclick="confirmGo(0)">Go for it!</button></div></div></li>
+                            <li id="li4"><div class="item" id="5"><div class="image loaded"><div class="inner"><div class="item-specific"><span title="Demand"><img src="./Demand.png" class="mCS_img_loaded">95</span><span title="Supply"><img src="./Supply.png" class="mCS_img_loaded">45</span><span title="Gap"><img src="./Gap.png" class="mCS_img_loaded">50</span></div><img src="./5.jpg" alt="" class="mCS_img_loaded"></div></div><div class="wrapper"><div id="5"><h3>Union Square</h3></div><div>Demand-supply Gap <div id="gap4" class="greenrec">50</div></div><div>Traffic Condition: <div class="greenrec">1 mi. 6 min</div><img src="./GoodTraff.png" class="mCS_img_loaded"></div><button id="button4" onclick="confirmGo(4)">Go for it!</button></div></div></li>
 
-							<li><div class="item" id="6"><div class="image loaded"><div class="inner"><div class="item-specific"><span title="Demand"><img src="./Demand.png" class="mCS_img_loaded">560</span><span title="Supply"><img src="./Supply.png" class="mCS_img_loaded">350</span><span title="Gap"><img src="./Gap.png" class="mCS_img_loaded">210</span></div><img src="./6.jpg" alt="" class="mCS_img_loaded"></div></div><div class="wrapper"><div id="6"><h3>LaGuardia Airport</h3></div><div>Demand-supply Gap <div id="gap0" class="redrec">210</div><img src="./GoodTraff.png" class="mCS_img_loaded"></div><div>Traffic Condition: <div class="yellowrec">5.2 mi. 21 min</div></div><button id="button0" onclick="confirmGo(0)">Go for it!</button></div></div></li>
+							<li id="li5" style="display:none;"><div class="item" id="6"><div class="image loaded"><div class="inner"><div class="item-specific"><span title="Demand"><img src="./Demand.png" class="mCS_img_loaded">560</span><span title="Supply"><img src="./Supply.png" class="mCS_img_loaded">350</span><span title="Gap"><img src="./Gap.png" class="mCS_img_loaded">210</span></div><img src="./6.jpg" alt="" class="mCS_img_loaded"></div></div><div class="wrapper"><div id="6"><h3>LaGuardia Airport</h3></div><div>Demand-supply Gap <div id="gap5" class="redrec">210</div><img src="./GoodTraff.png" class="mCS_img_loaded"></div><div>Traffic Condition: <div class="yellowrec">5.2 mi. 21 min</div></div><button id="button5" onclick="confirmGo(5)">Go for it!</button></div></div></li>
 							
-							<li><div class="item" id="7"><div class="image loaded"><div class="inner"><div class="item-specific"><span title="Demand"><img src="./Demand.png" class="mCS_img_loaded">65</span><span title="Supply"><img src="./Supply.png" class="mCS_img_loaded">20</span><span title="Gap"><img src="./Gap.png" class="mCS_img_loaded">55</span></div><img src="./7.jpg" alt="" class="mCS_img_loaded"></div></div><div class="wrapper"><div id="7"><h3>Museum of Moving Image</h3></div><div>Demand-supply Gap <div id="gap0" class="greenrec">45</div></div><div>Traffic Condition: <div class="greenrec">2.6 mi. 16 min</div><img src="./GoodTraff.png" class="mCS_img_loaded"></div><button id="button0" onclick="confirmGo(0)">Go for it!</button></div></div></li>
+							<li id="li6" style="display:none;"><div class="item" id="7"><div class="image loaded"><div class="inner"><div class="item-specific"><span title="Demand"><img src="./Demand.png" class="mCS_img_loaded">65</span><span title="Supply"><img src="./Supply.png" class="mCS_img_loaded">20</span><span title="Gap"><img src="./Gap.png" class="mCS_img_loaded">55</span></div><img src="./7.jpg" alt="" class="mCS_img_loaded"></div></div><div class="wrapper"><div id="7"><h3>Museum of Moving Image</h3></div><div>Demand-supply Gap <div id="gap6" class="greenrec">45</div></div><div>Traffic Condition: <div class="greenrec">2.6 mi. 16 min</div><img src="./GoodTraff.png" class="mCS_img_loaded"></div><button id="button6" onclick="confirmGo(6)">Go for it!</button></div></div></li>
 							
-							<li><div class="item" id="8"><div class="image loaded"><div class="inner"><div class="item-specific"><span title="Demand"><img src="./Demand.png" class="mCS_img_loaded">235</span><span title="Supply"><img src="./Supply.png" class="mCS_img_loaded">130</span><span title="Gap"><img src="./Gap.png" class="mCS_img_loaded">105</span></div><img src="./8.jpg" alt="" class="mCS_img_loaded"></div></div><div class="wrapper"><div id="8"><h3>Queens Zoo</h3></div><div>Demand-supply Gap <div id="gap0" class="yellowrec">105</div></div><div>Traffic Condition: <div class="yellowrec">5 mi. 24 min</div></div><button id="button0" onclick="confirmGo(0)">Go for it!</button></div></div></li>
+							<li id="li7" style="display:none;"><div class="item" id="8"><div class="image loaded"><div class="inner"><div class="item-specific"><span title="Demand"><img src="./Demand.png" class="mCS_img_loaded">235</span><span title="Supply"><img src="./Supply.png" class="mCS_img_loaded">130</span><span title="Gap"><img src="./Gap.png" class="mCS_img_loaded">105</span></div><img src="./8.jpg" alt="" class="mCS_img_loaded"></div></div><div class="wrapper"><div id="8"><h3>Queens Zoo</h3></div><div>Demand-supply Gap <div id="gap7" class="yellowrec">105</div></div><div>Traffic Condition: <div class="yellowrec">5 mi. 24 min</div></div><button id="button7" onclick="confirmGo(7)">Go for it!</button></div></div></li>
 							
-							<li><div class="item" id="9"><div class="image loaded"><div class="inner"><div class="item-specific"><span title="Demand"><img src="./Demand.png" class="mCS_img_loaded">660</span><span title="Supply"><img src="./Supply.png" class="mCS_img_loaded">405</span><span title="Gap"><img src="./Gap.png" class="mCS_img_loaded">255</span></div><img src="./9.jpg" alt="" class="mCS_img_loaded"></div></div><div class="wrapper"><div id="9"><h3>JFK Airport</h3></div><div>Demand-supply Gap <div id="gap0" class="redrec">255</div><img src="./GoodTraff.png" class="mCS_img_loaded"></div><div>Traffic Condition: <div class="redrec">10.7 mi. 45 min</div><img src="./BadTraff.png" class="mCS_img_loaded"></div><button id="button0" onclick="confirmGo(0)">Go for it!</button></div></div></li>
+							<li id="li8" style="display:none;"><div class="item" id="9"><div class="image loaded"><div class="inner"><div class="item-specific"><span title="Demand"><img src="./Demand.png" class="mCS_img_loaded">660</span><span title="Supply"><img src="./Supply.png" class="mCS_img_loaded">405</span><span title="Gap"><img src="./Gap.png" class="mCS_img_loaded">255</span></div><img src="./9.jpg" alt="" class="mCS_img_loaded"></div></div><div class="wrapper"><div id="9"><h3>JFK Airport</h3></div><div>Demand-supply Gap <div id="gap8" class="redrec">255</div><img src="./GoodTraff.png" class="mCS_img_loaded"></div><div>Traffic Condition: <div class="redrec">10.7 mi. 45 min</div><img src="./BadTraff.png" class="mCS_img_loaded"></div><button id="button8" onclick="confirmGo(8)">Go for it!</button></div></div></li>
 							
-							<li><div class="item" id="10"><div class="image loaded"><div class="inner"><div class="item-specific"><span title="Demand"><img src="./Demand.png" class="mCS_img_loaded">200</span><span title="Supply"><img src="./Supply.png" class="mCS_img_loaded">105</span><span title="Gap"><img src="./Gap.png" class="mCS_img_loaded">95</span></div><img src="./2.jpg" alt="" class="mCS_img_loaded"></div></div><div class="wrapper"><div id="10"><h3>Empire Building</h3></div><div>Demand-supply Gap <div id="gap0" class="yellowrec">95</div></div><div>Traffic Condition: <div class="yellowrec">4.3 mi. 31 min</div></div><button id="button0" onclick="confirmGo(0)">Go for it!</button></div></div></li></ul>
+							<li id="li9" style="display:none;"><div class="item" id="10"><div class="image loaded"><div class="inner"><div class="item-specific"><span title="Demand"><img src="./Demand.png" class="mCS_img_loaded">200</span><span title="Supply"><img src="./Supply.png" class="mCS_img_loaded">105</span><span title="Gap"><img src="./Gap.png" class="mCS_img_loaded">95</span></div><img src="./2.jpg" alt="" class="mCS_img_loaded"></div></div><div class="wrapper"><div id="10"><h3>Empire Building</h3></div><div>Demand-supply Gap <div id="gap9" class="yellowrec">95</div></div><div>Traffic Condition: <div class="yellowrec">4.3 mi. 31 min</div></div><button id="button9" onclick="confirmGo(9)">Go for it!</button></div></div></li></ul>
                     </div>
                     <!--results-->
                 </div></div></div>
@@ -404,55 +454,45 @@ https://www.google.com/maps/place/Queens+Zoo/@40.7436249,-73.8527027,17z/data=!4
 
     function showNews() {
       $('body').append('<div class="modal-window fade_in">'+
-'    <div class="modal-wrapper"><h2>This is System News</h2>'+
-'        <figure>63 Birch Street</figure>'+
-'        <div class="rating" data-rating="4"><span class="stars"><i class="fa fa-star s1 active" data-score="1"></i><i class="fa fa-star s2 active" data-score="2"></i><i class="fa fa-star s3 active" data-score="3"></i><i class="fa fa-star s4 active" data-score="4"></i><i class="fa fa-star s5" data-score="5"></i></span></div>'+
+'    <div class="modal-wrapper"><h2>Attention Please</h2>'+
+'        <h3>More demand around Broadway Theatre in 30 min!</h3>'+
 '        <div class="modal-body">'+
 '            <div class="gallery">'+
 '                <div class="image">'+
-'                    <div class="price">$2500</div>'+
-'                    <div class="type"><i><img src="./restaurant.png" alt=""></i><span>Apartment</span></div>'+
+'                    <div class="price">500+ More Demand</div>'+
+'                    <div class="type"><i><img src="./Gap.png" alt=""></i><span>Demand-supply Gap: 430</span></div>'+
 '                    <div class="owl-carousel gallery owl-theme owl-loaded">'+
-'                    <div class="owl-stage-outer"><div class="owl-stage" style="width: 1050px; transform: translate3d(0px, 0px, 0px); transition: 0s;"><div class="owl-item active" style="width: 350px; margin-right: 0px;"><img src="./1.jpg"></div><div class="owl-item" style="width: 350px; margin-right: 0px;"><img src="./5.jpg"></div><div class="owl-item" style="width: 350px; margin-right: 0px;"><img src="./4.jpg"></div></div></div><div class="owl-controls"><div class="owl-nav"><div class="owl-prev" style=""></div><div class="owl-next" style=""></div></div><div class="owl-dots" style=""><div class="owl-dot active"><span></span></div><div class="owl-dot"><span></span></div><div class="owl-dot"><span></span></div></div></div></div>'+
+'                    <div class="owl-stage-outer"><div class="owl-stage" style="width: 1050px; transform: translate3d(0px, 0px, 0px); transition: 0s;"><div class="owl-item active" style="width: 350px; margin-right: 0px;"><img src="./4.jpg"></div></div></div></div>'+
 '                </div>'+
-'                <div class="features"><h3>Features</h3>'+
+'                <div class="features"><h3>Recommended!</h3>'+
 '                    <ul class="bullets">'+
-'                        <li>Free Parking</li>'+
-'                        <li>Cards Accepted</li>'+
-'                        <li>Wi-Fi</li>'+
-'                        <li>Air Condition</li>'+
-'                        <li>Reservations</li>'+
-'                        <li>Teambuildings</li>'+
-'                        <li>Places to seat</li>'+
+'                        <li>Increasing gap</li>'+
+'                        <li>Good traffic</li>'+
+'                        <li>Close distance</li>'+
+'                        <li>High revenue per trip</li>'+
+'                        <li>Good weather</li>'+
 '                    </ul>'+
 '                </div>'+
 '            </div>'+
 '            <div class="modal-content">'+
-'                <section><h3>Description</h3>'+
+'                <section><h3>Details</h3>'+
 '                    <p>'+
-'                        Curabitur odio nibh, luctus non pulvinar a, ultricies ac diam. Donec neque'+
-'                        massa, viverra interdum eros ut, imperdiet pellentesque mauris. Proin sit amet scelerisque'+
-'                        risus. Donec semper semper erat ut mollis. Curabitur suscipit, justo eu dignissim lacinia, ante'+
-'                        sapien pharetra duin consectetur eros augue sed ex. Donec a odio rutrum, hendrerit sapien vitae'+
+'                        The famous show: the Lion King will end in 30min in Broadway Theatre.'+
+'                        There are 576 audience for this show, around 358 of them do not drive by car.'+
+'                        Subway is available for this area.'+
+'                        Above all, demand for Broadway Theatre will increase by 255 in 30 min.'+
 '                    </p>'+
 '                </section>'+
 '                <section><h3>Overview</h3>'+
 '                    <dl>'+
-'                        <dt>Bedrooms</dt>'+
-'                        <dd>2</dd>'+
-'                        <dt>Bedrooms</dt>'+
-'                        <dd>2</dd>'+
-'                        <dt>Area</dt>'+
-'                        <dd>240</dd>'+
-'                        <dt>Garages</dt>'+
-'                        <dd>1</dd>'+
+'                        <dt>Weather</dt>'+
+'                        <dd>Sunny</dd>'+
+'                        <dt>Traffic</dt>'+
+'                        <dd>1.9 mi. 20 min</dd>'+
+'                        <dt>Other Ground Transportation Options</dt>'+
+'                        <dd>subway available</dd>'+
 '                    </dl>'+
-'                </section>'+
-'                <section><h3>Last Review</h3>'+
-'                    <div class="rating" data-rating="5"><span class="stars"><i class="fa fa-star s1 active" data-score="1"></i><i class="fa fa-star s2 active" data-score="2"></i><i class="fa fa-star s3 active" data-score="3"></i><i class="fa fa-star s4 active" data-score="4"></i><i class="fa fa-star s5 active" data-score="5"></i></span></div>'+
-'                    <p>Curabitur odio nibh, luctus non pulvinar a, ultricies ac diam. Donec neque massa, viverra interdum eros ut, imperdiet</p>'+
-'                </section>'+
-'                <div onclick="hideNews()" class="btn btn-default btn-large">Show Detail</div></div>'+
+'                <div onclick="hideNews()" class="btn btn-default btn-large">I will go</div></div>'+
 '        </div>'+
 '        <div class="modal-close"><img src="./close.png"></div>'+
 '    </div>'+
