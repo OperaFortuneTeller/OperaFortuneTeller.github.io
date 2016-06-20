@@ -93,9 +93,14 @@ https://www.google.com/maps/place/Queens+Zoo/@40.7436249,-73.8527027,17z/data=!4
           map.addListener('bounds_changed', function() {
             searchBox.setBounds(map.getBounds());
           });
+
+          if (getParameterByName("xxx") == "true") {
+            document.getElementById("xxx").innerHTML = "Jennifer Hebein";
+          }          
         }
 
         function places_changed() {
+
           scenarioNum++;
           showList();
           var places = searchBox.getPlaces();
@@ -271,8 +276,17 @@ https://www.google.com/maps/place/Queens+Zoo/@40.7436249,-73.8527027,17z/data=!4
           }
        }
         
-       
+        function getParameterByName(name) {
+            url = window.location.href;
+            name = name.replace(/[\[\]]/g, "\\$&");
+            var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, " "));
+        }       
       //google.maps.event.addDomListener(window, 'load', initialize);
+
     </script>
 
 
@@ -294,7 +308,9 @@ https://www.google.com/maps/place/Queens+Zoo/@40.7436249,-73.8527027,17z/data=!4
                     <div class="wrapper">
                         <ul class="main-navigation navigation-top-header"></ul>
                         <ul class="user-area">
-                            <li><a href="./sign_in.html">Sign In</a></li>
+                            <!-- <li>Jennifer Hebein</li>
+                            <li><a href="./sign_in.html"><strong>Sign Out</strong></a></li>
+                             --><li id="xxx"><a href="./sign_in.html">Sign In</a></li>
                             <li><a href="./register.html"><strong>Register</strong></a></li>
                         </ul>
                         <div onclick="showNews()" class="submit-item">
